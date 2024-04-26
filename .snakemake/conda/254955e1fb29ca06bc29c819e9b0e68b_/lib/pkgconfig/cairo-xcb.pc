@@ -1,0 +1,8 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+includedir=${prefix}/include
+
+Name: cairo-xcb
+Description: XCB surface backend for cairo graphics library
+Version: 1.18.0
+Requires: cairo, xcb >=  1.6, xcb-render >=  1.6
+Cflags: -I${includedir}

@@ -1,0 +1,17 @@
+sequencing_units: config/sequencing_units.tsv
+sample_units: config/samples.tsv
+references: config/references.tsv
+
+resources_config: config/resources.yaml
+
+demultiplexing:
+  re_enzyme: "apeKI"
+
+trimmomatic:
+    pe:
+      trimmer:
+        - "LEADING:5"
+        - "TRAILING:5"
+        - "SLIDINGWINDOW:4:5"
+        - "MINLEN:36"
+        - "ILLUMINACLIP:data/adapter.fa:2:20:7:2"

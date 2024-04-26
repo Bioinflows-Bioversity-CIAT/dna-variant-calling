@@ -1,0 +1,22 @@
+#***************************************************************************
+# Project        ___       __ _ _ __ ___  ___ 
+#               / __|____ / _` | '__/ _ \/ __|
+#              | (_|_____| (_| | | |  __/\__ \
+#               \___|     \__,_|_|  \___||___/
+#
+# Copyright (C) The c-ares project and its contributors
+# SPDX-License-Identifier: MIT
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/bin
+libdir=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/lib
+includedir=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/include
+
+Name: c-ares
+URL: https://c-ares.org/
+Description: asynchronous DNS lookup library
+Version: 1.28.1
+Requires: 
+Requires.private: 
+Cflags: -I${includedir}
+Libs: -L${libdir} -lcares
+Libs.private: 

@@ -1,0 +1,18 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+description: row of the samples.tsv, representing a individual sample
+type: object
+properties:
+  plate:
+    type: integer
+    description: Plate identification name
+  line_id:
+    type: string
+    description: Individual sample name
+  barcode:
+    type: string
+    description: Barcode nucleotide sequence to demultiplex each sample
+
+required:
+  - plate
+  - line_id
+  - barcode

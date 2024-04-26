@@ -1,0 +1,12 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Readline
+Description: Gnu Readline library for command line editing
+URL: http://tiswww.cwru.edu/php/chet/readline/rltop.html
+Version: 8.2
+Requires.private: tinfo
+Libs: -L${libdir} -lreadline
+Cflags: -I${includedir}

@@ -1,0 +1,13 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libedit
+Description: command line editor library provides generic line editing, history, and tokenization functions.
+Version: 3.1
+Requires:
+Libs: -L${libdir} -ledit
+Libs.private: -lncurses 
+Cflags: -I${includedir} -I${includedir}/editline
+

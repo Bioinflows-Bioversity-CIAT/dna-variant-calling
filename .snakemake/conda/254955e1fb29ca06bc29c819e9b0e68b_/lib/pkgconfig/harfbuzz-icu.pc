@@ -1,0 +1,11 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: harfbuzz-icu
+Description: HarfBuzz text shaping library ICU integration
+Version: 8.3.0
+Requires: harfbuzz =  8.3.0
+Requires.private: icu-uc
+Libs: -L${libdir} -lharfbuzz-icu
+Cflags: -I${includedir}/harfbuzz

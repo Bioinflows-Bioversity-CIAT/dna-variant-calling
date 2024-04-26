@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+usage="\
+Usage:
+  $(basename "$0") DIST_FILE
+  $(basename "$0") [--pretty] DIST_FILE SECTION_NAME
+
+(1) Prints available sections/distributions for DIST_FILE.
+(2) Extracts section SECTION_NAME from DIST_FILE.
+"
+
+if { [[ $# -ne 1 ]] && [[ $# -ne 2 ]] && [[ $# -ne 3 ]]; } || [[ "$1" =~ ^(-h|--help|--version)$ ]] ;then
+    echo -n "$usage" >&2
+    exit 1
+fi
+
+if [[ "$1" =~ ^--pretty$ ]]; then 
+    dist_f="$2"
+    sect="$3"
+else
+    dist_f="$1"
+    sect="$2"
+fi
+
+[[ -e "$dist_f" ]] || { ls -- "$dist_f"; exit 1; }
+
+if [[ $# -ge 2 ]] ;then
+    section="$(echo "$sect" | grep -oE '\w+' | tr -d '\n')"
+    if ! grep --quiet "^BEGIN $section\\b" "$dist_f" ;then
+        echo "Error: Couldn't find section '$section' in '$dist_f'." >&1
+        exit 1
+    fi
+
+    if [[ "$1" =~ ^--pretty$ ]]; then 
+	sed -nE "/^END $section($| )/ q; /^BEGIN $section($| )/,$ p" "$dist_f" | sed 1d | sed -nE "/^#/p"
+	sed -nE "/^END $section($| )/ q; /^BEGIN $section($| )/,$ p" "$dist_f" | sed 1d | grep -v "^#" | column -s "	" -t
+    else
+	sed -nE "/^END $section($| )/ q; /^BEGIN $section($| )/,$ p" "$dist_f" | sed 1d
+    fi
+else
+    grep ^BEGIN "$dist_f" | cut -c7-
+fi

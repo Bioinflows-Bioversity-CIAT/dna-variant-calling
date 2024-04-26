@@ -1,0 +1,10 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+includex11dir=${prefix}/include/X11
+ 
+Name: Xproto
+Description: Xproto headers
+Version: 7.0.31
+Cflags: -I${includedir}

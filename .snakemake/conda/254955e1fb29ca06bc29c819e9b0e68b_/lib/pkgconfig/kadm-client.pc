@@ -1,0 +1,11 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: kadm-client
+Description: Kerberos administration client library
+Version: 1.21.2
+Requires.private: mit-krb5-gssapi gssrpc
+Cflags: -I${includedir}
+Libs: -L${libdir} -lkadm5clnt_mit

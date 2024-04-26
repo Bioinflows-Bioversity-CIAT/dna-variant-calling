@@ -1,0 +1,47 @@
+{
+  "build": "pl5321hd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "perl >=5.32.1,<6.0a0 *_perl5",
+    "perl-exporter"
+  ],
+  "extracted_package_dir": "/home/scruz/.conda/pkgs/perl-file-path-2.18-pl5321hd8ed1ab_0",
+  "features": "",
+  "files": [
+    "lib/perl5/vendor_perl/File/Path.pm"
+  ],
+  "fn": "perl-file-path-2.18-pl5321hd8ed1ab_0.tar.bz2",
+  "license": "GPL-1.0-or-later OR Artistic-1.0-Perl",
+  "license_family": "OTHER",
+  "link": {
+    "source": "/home/scruz/.conda/pkgs/perl-file-path-2.18-pl5321hd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "e13e456f61b8261ba074c0aa93086afe",
+  "name": "perl-file-path",
+  "noarch": "generic",
+  "package_tarball_full_path": "/home/scruz/.conda/pkgs/perl-file-path-2.18-pl5321hd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_generic",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "lib/perl5/vendor_perl/File/Path.pm",
+        "path_type": "hardlink",
+        "sha256": "a1aa35a2f08a57e1b2684733c32e435cadbcac7be6652b0a5a528a6a122211aa",
+        "sha256_in_prefix": "a1aa35a2f08a57e1b2684733c32e435cadbcac7be6652b0a5a528a6a122211aa",
+        "size_in_bytes": 43254
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "ac7a0e0c36ec199709c8523132ded35efb84941a1a476b271fd25362dfbf5339",
+  "size": 22382,
+  "subdir": "noarch",
+  "timestamp": 1636696260633,
+  "track_features": "",
+  "url": "https://conda.anaconda.org/conda-forge/noarch/perl-file-path-2.18-pl5321hd8ed1ab_0.tar.bz2",
+  "version": "2.18"
+}

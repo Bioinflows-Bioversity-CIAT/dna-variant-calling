@@ -1,0 +1,13 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: expat
+Version: 2.6.2
+Description: expat XML parser
+URL: https://libexpat.github.io/
+Libs: -L${libdir} -lexpat
+Libs.private: -lm
+Cflags: -I${includedir}
+Cflags.private: -DXML_STATIC

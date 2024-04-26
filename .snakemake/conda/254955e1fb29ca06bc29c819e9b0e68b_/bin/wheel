@@ -1,0 +1,10 @@
+#!/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/bin/python3.12
+# -*- coding: utf-8 -*-
+import re
+import sys
+
+from wheel.cli import main
+
+if __name__ == '__main__':
+    sys.argv[0] = re.sub(r'(-script\.pyw?|\.exe)?$', '', sys.argv[0])
+    sys.exit(main())

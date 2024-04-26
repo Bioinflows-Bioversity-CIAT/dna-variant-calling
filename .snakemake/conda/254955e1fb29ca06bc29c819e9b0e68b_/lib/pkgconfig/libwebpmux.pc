@@ -1,0 +1,12 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libwebpmux
+Description: Library for manipulating the WebP graphics format container
+Version: 1.4.0
+Requires.private: libwebp >= 0.2.0
+Cflags: -I${includedir}
+Libs: -L${libdir} -lwebpmux
+Libs.private: -lm

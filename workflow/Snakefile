@@ -1,0 +1,11 @@
+include: "rules/common.smk"
+
+rule all:
+    input:
+        demultiplexing = "results/44/reads/demultiplexing/stacks"
+
+# Modules
+include: "rules/ref.smk"
+include: "rules/demultiplexing.smk"
+include: "rules/read_trimming.smk"
+include: "rules/mapping.smk"

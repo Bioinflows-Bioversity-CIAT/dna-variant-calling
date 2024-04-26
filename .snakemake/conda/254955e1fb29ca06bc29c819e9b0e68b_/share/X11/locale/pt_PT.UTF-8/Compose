@@ -1,0 +1,3 @@
+include "/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/share/X11/locale/en_US.UTF-8/Compose"
+<dead_acute> <C>	: "Ç" Ccedilla # LATIN CAPITAL LETTER C WITH CEDILLA
+<dead_acute> <c>	: "ç" ccedilla # LATIN SMALL LETTER C WITH CEDILLA

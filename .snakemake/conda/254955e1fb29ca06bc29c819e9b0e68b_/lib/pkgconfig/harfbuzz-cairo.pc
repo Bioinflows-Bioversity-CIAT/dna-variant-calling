@@ -1,0 +1,12 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: harfbuzz-cairo
+Description: HarfBuzz cairo support
+Version: 8.3.0
+Requires: harfbuzz =  8.3.0
+Requires.private: freetype2, glib-2.0, graphite2, cairo
+Libs: -L${libdir} -lharfbuzz-cairo
+Libs.private: -lm -L${libdir} -lharfbuzz -pthread
+Cflags: -I${includedir}/harfbuzz

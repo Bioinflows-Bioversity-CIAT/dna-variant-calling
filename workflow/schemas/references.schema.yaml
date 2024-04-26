@@ -1,0 +1,17 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+description: row of the samples.tsv, representing a individual sample
+type: object
+properties:
+  ref_name:
+    type: string
+    description: Reference identification name
+  ref_path:
+    type: string
+    description: Path to reference genome fasta file
+  STR_path:
+    type: string
+    description: Path to short tandem repeats genome annotations
+
+required:
+  - ref_name
+  - ref_path

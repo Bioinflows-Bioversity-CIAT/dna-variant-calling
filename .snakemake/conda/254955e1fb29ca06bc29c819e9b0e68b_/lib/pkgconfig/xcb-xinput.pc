@@ -1,0 +1,11 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: XCB XInput
+Description: XCB XInput Extension (EXPERIMENTAL)
+Version: 1.15
+Requires.private: xcb xcb-xfixes
+Libs: -L${libdir} -lxcb-xinput
+Cflags: -I${includedir}

@@ -1,0 +1,6 @@
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - stacks==2.65

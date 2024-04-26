@@ -1,0 +1,10 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: GThread
+Description: Thread support for GLib
+Version: 2.78.4
+Requires: glib-2.0
+Libs: -L${libdir} -lgthread-2.0 -pthread
+Cflags: -I${includedir} -pthread

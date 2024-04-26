@@ -1,0 +1,5 @@
+#!/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/bin/python3.12
+import sys
+from lib2to3.main import main
+
+sys.exit(main("lib2to3.fixes"))

@@ -1,0 +1,10 @@
+stacks:
+  process_radtags:
+    threads: 50
+
+trimmomatic:
+  threads: 5
+  mem: 4096
+
+bwa_mem:
+    threads: 10

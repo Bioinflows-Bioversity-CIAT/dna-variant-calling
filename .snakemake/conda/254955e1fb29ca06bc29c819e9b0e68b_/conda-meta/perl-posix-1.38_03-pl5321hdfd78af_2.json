@@ -1,0 +1,35 @@
+{
+  "build": "pl5321hdfd78af_2",
+  "build_number": 2,
+  "channel": "https://conda.anaconda.org/bioconda/noarch",
+  "constrains": [],
+  "depends": [
+    "perl >=5.32.1,<6.0a0 *_perl5"
+  ],
+  "extracted_package_dir": "/home/scruz/.conda/pkgs/perl-posix-1.38_03-pl5321hdfd78af_2",
+  "features": "",
+  "files": [],
+  "fn": "perl-posix-1.38_03-pl5321hdfd78af_2.tar.bz2",
+  "license": "perl_5",
+  "link": {
+    "source": "/home/scruz/.conda/pkgs/perl-posix-1.38_03-pl5321hdfd78af_2",
+    "type": 1
+  },
+  "md5": "9853e71918e3781653523128df32bd13",
+  "name": "perl-posix",
+  "noarch": "generic",
+  "package_tarball_full_path": "/home/scruz/.conda/pkgs/perl-posix-1.38_03-pl5321hdfd78af_2.tar.bz2",
+  "package_type": "noarch_generic",
+  "paths_data": {
+    "paths": [],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "357c175658629edc710377870c461efffe0fb58eed179baf47168b1e3a0ca701",
+  "size": 5753,
+  "subdir": "noarch",
+  "timestamp": 1642378999179,
+  "track_features": "",
+  "url": "https://conda.anaconda.org/bioconda/noarch/perl-posix-1.38_03-pl5321hdfd78af_2.tar.bz2",
+  "version": "1.38_03"
+}

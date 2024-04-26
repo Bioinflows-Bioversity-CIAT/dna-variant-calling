@@ -1,0 +1,11 @@
+prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: harfbuzz-subset
+Description: HarfBuzz font subsetter
+Version: 8.3.0
+Requires: harfbuzz =  8.3.0
+Libs: -L${libdir} -lharfbuzz-subset
+Libs.private: -lm
+Cflags: -I${includedir}/harfbuzz

@@ -1,0 +1,46 @@
+{
+  "build": "pl5321hd8ed1ab_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "constrains": [],
+  "depends": [
+    "perl >=5.32.1,<6.0a0 *_perl5"
+  ],
+  "extracted_package_dir": "/home/scruz/.conda/pkgs/perl-constant-1.33-pl5321hd8ed1ab_0",
+  "features": "",
+  "files": [
+    "lib/perl5/vendor_perl/constant.pm"
+  ],
+  "fn": "perl-constant-1.33-pl5321hd8ed1ab_0.tar.bz2",
+  "license": "GPL-1.0-or-later OR Artistic-1.0-Perl",
+  "license_family": "OTHER",
+  "link": {
+    "source": "/home/scruz/.conda/pkgs/perl-constant-1.33-pl5321hd8ed1ab_0",
+    "type": 1
+  },
+  "md5": "7f9fc9cfa08a3fe36ffcff820c65c3ac",
+  "name": "perl-constant",
+  "noarch": "generic",
+  "package_tarball_full_path": "/home/scruz/.conda/pkgs/perl-constant-1.33-pl5321hd8ed1ab_0.tar.bz2",
+  "package_type": "noarch_generic",
+  "paths_data": {
+    "paths": [
+      {
+        "_path": "lib/perl5/vendor_perl/constant.pm",
+        "path_type": "hardlink",
+        "sha256": "e67cdfa533d42cbe5265bcf3c270f055620cba38a9295b5d584b7efc37a0c156",
+        "sha256_in_prefix": "e67cdfa533d42cbe5265bcf3c270f055620cba38a9295b5d584b7efc37a0c156",
+        "size_in_bytes": 14724
+      }
+    ],
+    "paths_version": 1
+  },
+  "requested_spec": "None",
+  "sha256": "cfd5ef9af8de221292f7059d1ff88ff10f1340fc4dbbd0dc81ce2275bf76651d",
+  "size": 15711,
+  "subdir": "noarch",
+  "timestamp": 1636645107290,
+  "track_features": "",
+  "url": "https://conda.anaconda.org/conda-forge/noarch/perl-constant-1.33-pl5321hd8ed1ab_0.tar.bz2",
+  "version": "1.33"
+}

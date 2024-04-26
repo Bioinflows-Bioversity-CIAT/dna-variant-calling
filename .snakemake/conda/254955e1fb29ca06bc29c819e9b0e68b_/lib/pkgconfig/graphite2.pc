@@ -1,0 +1,7 @@
+
+Name: Graphite2
+Description: Font rendering engine for Complex Scripts
+Version: 3.0.1
+Libs: -L/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/lib -lgraphite2
+Cflags: -I/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_/include
+

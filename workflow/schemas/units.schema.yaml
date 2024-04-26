@@ -1,0 +1,28 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+description: row of the sequencig_units.csv, representing a sequencing unit, i.e. single-end or paired-end data
+type: object
+properties:
+  flowcell_id:
+    type: string
+    description: ID of the sequencing unit
+  lane:
+    type: integer
+    description: flowcell lane id
+  index:
+    type: string
+    description: Nucleotide sequence index 
+  plate:
+    type: integer
+    description: Plate identification name
+  fq1:
+    type: string
+    description: path to first FASTQ file 
+  fq2:
+    type: string
+    description: path to second FASTQ file (leave empty in case of single-end)
+
+required:
+  - flowcell_id
+  - lane
+  - plate
+  - fq1
