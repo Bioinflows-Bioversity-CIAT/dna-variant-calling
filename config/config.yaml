@@ -7,6 +7,9 @@ resources_config: config/resources.yaml
 demultiplexing:
   re_enzyme: "apeKI"
 
+outdir: "/opt/bean_fast/5.Others/"
+bigtmp: tmpdir/
+
 trimmomatic:
     pe:
       trimmer:

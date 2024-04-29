@@ -1,3 +1,13 @@
+rule copy_reference:
+    input:
+        fasta = get_reference_fasta
+    output:
+        "resources/{ref}.fasta"
+    shell:
+        """
+        cp {input.fasta} {output}
+        """
+
 rule genome_faidx:
     input:
         path = "resources/{ref}.fasta"
@@ -5,7 +15,7 @@ rule genome_faidx:
         "resources/{ref}.fasta.fai"
     cache: True
     wrapper:
-        "v3.9.0/bio/samtools/faidx"
+        "file:///home/scruz/software/snakemake-wrappers/bio/samtools/faidx"
 
 rule bwa_index:
     input:
@@ -17,4 +27,5 @@ rule bwa_index:
     params:
         algorithm="bwtsw",
     wrapper:
-        "v3.9.0/bio/bwa/index"
+        "file:///home/scruz/software/snakemake-wrappers/bio/bwa/index"
+

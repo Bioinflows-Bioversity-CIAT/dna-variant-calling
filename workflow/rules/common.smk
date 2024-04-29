@@ -2,11 +2,14 @@ import pandas as pd
 from snakemake.utils import validate
 from snakemake.utils import min_version
 from yaml import safe_load
+import glob as glob
 
 min_version("5.18.0")
 
 # Config params
 configfile: "config/config.yaml"
+
+
 # Resources params
 with open(config["resources_config"], "r") as f:
     resources = safe_load(f)
@@ -26,6 +29,7 @@ sample_units = sample_units.merge(sequencing_units[['sequencing_unit_id', 'plate
 
 references = pd.read_table(config['references'], sep = '\t')
 validate(references, schema="../schemas/references.schema.yaml")
+references.set_index("ref_name", inplace = True)
 
 
 sequencing_units.set_index("plate", inplace = True)
@@ -93,3 +97,16 @@ def get_big_temp(wildcards):
             return config['bigtmp'] + "/" + "".join(random.choices(string.ascii_uppercase, k=12)) + "/"
     else:
         return tempfile.gettempdir()
+
+def get_sample_by_plate_test(ref, plate):
+    plate_df = sample_units[sample_units['plate'] == plate]
+    vcfs = list()
+    for n, row in plate_df.iterrows():
+        i_vcf = 'results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam'.format(plate=row.plate, 
+                                                                                 sample=row.line_id,
+                                                                                 ref=ref)
+        vcfs.append(i_vcf)
+    return vcfs
+
+def get_reference_fasta(wildcards):
+    return(references.loc[wildcards.ref, "ref_path"])

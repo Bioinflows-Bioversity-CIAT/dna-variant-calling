@@ -1,4 +1,2 @@
 ref_name	ref_path	STR_path
-v2.1	resources/v2.1.fasta	resources/Pvulgaris_442_v2.0.fa.2.7.7.80.10.20.50_filtered.ngs
-UI_111	resources/UI_111.fasta	resources/PvulgarisUI111_534_v1.0.2.7.7.80.10.20.50_filtered.ngs
-VAP_009	resources/VAP_009_scaffolded.fasta
+v2.1	/opt/bioinfo/parte1/bioinfo1/references/bean/Pvulgaris/G19833/v2.1/assembly/Pvulgaris_442_v2.0.fa	/opt/bioinfo/parte1/bioinfo1/references/bean/Pvulgaris/G19833/v2.1/STRs/Pvulgaris_442_v2.0.fa.2.7.7.80.10.20.50_filtered.ngs

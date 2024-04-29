@@ -3,7 +3,7 @@ rule map_reads:
         reads = get_trimmed_reads,
         idx = rules.bwa_index.output,
     output:
-        temp("results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam")
+        "results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam"
     log:
         "results/{plate}/logs/bwa/{ref}/{sample}.log"
     params:
@@ -15,5 +15,5 @@ rule map_reads:
         tmpdir = get_big_temp
     threads: resources['bwa_mem']['threads']
     wrapper:
-        "v3.9.0/bio/bwa/mem"              
+        "file:///home/scruz/software/snakemake-wrappers/bio/bwa/mem"              
 

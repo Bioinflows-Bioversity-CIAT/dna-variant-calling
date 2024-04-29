@@ -1,8 +1,9 @@
 include: "rules/common.smk"
-
+workdir: config['outdir']
 rule all:
     input:
-        demultiplexing = "results/44/reads/demultiplexing/stacks"
+        demultiplexing = "results/44/reads/demultiplexing/stacks",
+        mapping = get_sample_by_plate_test('v2.1', '44')
 
 # Modules
 include: "rules/ref.smk"
