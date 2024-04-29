@@ -1,4 +1,0 @@
-channels:
-  - bioconda
-dependencies:
-  - stacks==2.65

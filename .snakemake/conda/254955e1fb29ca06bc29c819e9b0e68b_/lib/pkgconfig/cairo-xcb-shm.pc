@@ -1,8 +1,0 @@
-prefix=/home/scruz/workflows/dna-variant-calling/.snakemake/conda/254955e1fb29ca06bc29c819e9b0e68b_
-includedir=${prefix}/include
-
-Name: cairo-xcb-shm
-Description: XCB/SHM functions for cairo graphics library
-Version: 1.18.0
-Requires: cairo, xcb-shm
-Cflags: -I${includedir}
