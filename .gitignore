@@ -1,3 +1,7 @@
 # results folder 
-results/
-resources/
+results*
+resources*
+.snakemake/**
+data/
+logs*
+nohup.out

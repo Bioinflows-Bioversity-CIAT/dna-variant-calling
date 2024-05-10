@@ -7,7 +7,6 @@ resources_config: config/resources.yaml
 demultiplexing:
   re_enzyme: "apeKI"
 
-outdir: "/opt/bean_fast/5.Others/"
 bigtmp: tmpdir/
 
 trimmomatic:
@@ -18,3 +17,15 @@ trimmomatic:
         - "SLIDINGWINDOW:4:5"
         - "MINLEN:36"
         - "ILLUMINACLIP:data/adapter.fa:2:20:7:2"
+
+NGSEP:
+    path: /home/scruz/software//NGSEPcore/NGSEPcore_5.0.0.jar
+    SingleSampleVariantsDetector:
+        h: 0.0001
+        maxBaseQS: 30
+        minQuality: 40
+        maxAlnsPerStartPos: 100
+        ignore5: 7
+        ignore3: 8
+    VCFFilter:
+        QC_thresold: 40

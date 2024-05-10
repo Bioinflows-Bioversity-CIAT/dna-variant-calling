@@ -1,2 +1,2 @@
 flowcell_id	lane	index	sequencing_unit_id	plate	fq1	fq2
-HF7JFCCX2	8		HF7JFCCX2-8	44	/opt/bioinfo/parte2/bionas1/bean/GBSplates/44/reads/lane/GCDT_20-01_44_1.fastq.gz	/opt/bioinfo/parte2/bionas1/bean/GBSplates/44/reads/lane/GCDT_20-01_44_2.fastq.gz
+HF7JFCCX2	8		HF7JFCCX2-8	44	/home/scruz/workflows/dna-variant-calling/data/GCDT_20-01_44_1.fastq.gz	/home/scruz/workflows/dna-variant-calling/data/GCDT_20-01_44_2.fastq.gz

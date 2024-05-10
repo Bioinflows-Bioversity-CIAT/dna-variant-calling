@@ -1,12 +1,12 @@
 include: "rules/common.smk"
-workdir: config['outdir']
+
 rule all:
     input:
-        demultiplexing = "results/44/reads/demultiplexing/stacks",
-        mapping = get_sample_by_plate_test('v2.1', '44')
+        vcf = "results/44/mapping/v21/NGSEP/vcf/44_merged.vcf.gz"
 
 # Modules
 include: "rules/ref.smk"
 include: "rules/demultiplexing.smk"
 include: "rules/read_trimming.smk"
 include: "rules/mapping.smk"
+include: "rules/variant_calling_NGSEP.smk"

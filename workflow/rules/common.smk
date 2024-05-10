@@ -3,6 +3,8 @@ from snakemake.utils import validate
 from snakemake.utils import min_version
 from yaml import safe_load
 import glob as glob
+import random
+import string
 
 min_version("5.18.0")
 
@@ -110,3 +112,26 @@ def get_sample_by_plate_test(ref, plate):
 
 def get_reference_fasta(wildcards):
     return(references.loc[wildcards.ref, "ref_path"])
+
+
+def get_sample_vcfs_by_plate_merge_variants(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+
+    vcfs = expand("results/{plate}/mapping/{ref}/NGSEP/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
+        plate = wildcards.plate,
+        ref = wildcards.ref,
+        sample = sample_names )
+    return vcfs
+
+def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+
+    vcfs = expand("results/{plate}/mapping/{ref}/NGSEP/vcf/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
+        plate = wildcards.plate,
+        ref = wildcards.ref,
+        sample = sample_names )
+    return vcfs
