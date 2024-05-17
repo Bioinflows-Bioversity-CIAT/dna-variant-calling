@@ -29,3 +29,6 @@ NGSEP:
         ignore3: 8
     VCFFilter:
         QC_thresold: 40
+
+GATK:
+  interval_length: 1000000
