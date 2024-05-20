@@ -135,3 +135,31 @@ def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
         ref = wildcards.ref,
         sample = sample_names )
     return vcfs
+
+def get_GATK_HaplotypeCaller_params():
+    # Annotation params
+    annot = ' '.join(["-G {p}".format(p=p) for p in config["GATK"]['HaplotypeCaller']['G']])
+    kmers = ' '.join(["-kmer-size {p}".format(p=p) for p in config["GATK"]['HaplotypeCaller']['kmer-size']])
+    extra = ' '.join(["{p}".format(p=p) for p in config["GATK"]['HaplotypeCaller']['extra']])
+    min_base_qual = "--min-base-quality-score {p}".format(p=config["GATK"]['HaplotypeCaller']['min_base-qual'])
+    params = ' '.join([min_base_qual, annot, kmers, extra])
+    return params
+
+def get_GATK_CombineGVCFs_params():
+    # Annotation params
+    annot = ' '.join(["-G {p}".format(p=p) for p in config["GATK"]['CombineGVCFs']['G']])
+    return annot
+
+def get_gvcfs_by_sample(wildcards):
+    intervals = pd.read_csv("resources/{ref}_intervals.txt".format(**wildcards), header = None)
+    gvcfs = ['results/{plate}/mapping/{ref}/GATK/gvcf/intervals/{sample}/{sample}_{interval}.g.vcf.gz'.format(
+        interval = i[0],
+        **wildcards) for n,i in intervals.iterrows()]
+    return gvcfs
+
+
+wildcard_constraints:
+    sq_unit = "|".join(sequencing_units['sequencing_unit_id'].unique()),
+    plate="|".join(sample_units['plate'].unique()),
+    sample="|".join(sample_units['line_id'].unique()),
+    ref = "|".join(references.index)

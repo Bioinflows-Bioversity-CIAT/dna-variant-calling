@@ -8,3 +8,10 @@ trimmomatic:
 
 bwa_mem:
     threads: 10
+
+GATK:
+  HaplotypeCaller:
+    threads: 4
+    mem: 1024
+  CombineGVCFs:
+    mem: 1024

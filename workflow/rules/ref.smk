@@ -52,3 +52,15 @@ rule get_intervals:
                         print(interval_text, file=out)
                         start += params.l
                         end += params.l
+rule create_dict:
+    input:
+        "resources/{ref}.fasta"
+    output:
+        "resources/{ref}.dict"
+    log:
+        "resources/{ref}_dict.log",
+    params:
+    resources:
+        mem_mb=1024,
+    wrapper:
+        "file:///home/scruz/software/snakemake-wrappers/bio/picard/createsequencedictionary"

@@ -17,3 +17,15 @@ rule map_reads:
     wrapper:
         "file:///home/scruz/software/snakemake-wrappers/bio/bwa/mem"              
 
+rule samtools_index:
+    input:
+        "results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam",
+    output:
+        "results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam.bai",
+    log:
+        "results/{plate}/mapping/{ref}/bwa/mapping/log/{sample}_index.log",
+    params:
+        extra="",  # optional params string
+    threads: 4  # This value - 1 will be sent to -@
+    wrapper:
+        "file:///home/scruz/software/snakemake-wrappers/bio/samtools/index"

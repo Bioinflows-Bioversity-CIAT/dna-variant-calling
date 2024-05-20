@@ -32,3 +32,11 @@ NGSEP:
 
 GATK:
   interval_length: 1000000
+  HaplotypeCaller:
+    G: ["StandardAnnotation", "StandardHCAnnotation"]
+    kmer-size: [11,17,23,29,35,41]
+    min_base-qual: 28
+    extra:
+      - "--do-not-run-physical-phasing"
+  CombineGVCFs:
+    G: ["StandardAnnotation", "StandardHCAnnotation"]
