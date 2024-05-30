@@ -1,9 +1,9 @@
 rule single_sample_variant_detector:
     input:
-        bam="results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam",
-        ref="resources/{ref}.fasta"
+        bam=rules.map_reads.output,
+        ref=rules.copy_reference.output
     output:
-        "results/{plate}/mapping/{ref}/NGSEP/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz"
+        temp("results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz")
     params:
         params = " ".join(["-{param} {value}".format(param=i_param, value = config['NGSEP']['SingleSampleVariantsDetector'][i_param]) for i_param in config['NGSEP']['SingleSampleVariantsDetector'].keys()]),
         mem = "-Xmx3g"
@@ -12,7 +12,7 @@ rule single_sample_variant_detector:
     conda:
         "../envs/NGSEP.yaml"
     log:
-        "results/{plate}/mapping/{ref}/NGSEP/first_variant_calling/{sample}_bwa_NGSEP.log"
+        'results/{plate}/variant_calling/NGSEP/{ref}/log/first_variant_calling/{sample}_bwa_NGSEP.log'
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
@@ -27,7 +27,7 @@ rule single_sample_variant_detector:
 rule merge_variants_by_plate:
     input:
         vcfs = get_sample_vcfs_by_plate_merge_variants,
-        ref_list = "resources/{ref}.fasta.fai"
+        ref_list = rules.genome_faidx.output
     params:
         mem = "-Xmx40g"
     resources:
@@ -35,9 +35,9 @@ rule merge_variants_by_plate:
     conda:
         "../envs/NGSEP.yaml"
     output:
-        'results/{plate}/mapping/{ref}/NGSEP/vcf/{plate}_merged_variants.vcf'
+        temp('results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged_variants.vcf')
     log:
-        'results/{plate}/mapping/{ref}/NGSEP/vcf/{plate}_merged_variants.log'
+        'results/{plate}/variant_calling/NGSEP/{ref}/log/merge_variants/{plate}_merged_variants.log'
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
@@ -46,12 +46,11 @@ rule merge_variants_by_plate:
         
 rule single_sample_variant_detector_two:
     input:
-        bam="results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam",
-        ref="resources/{ref}.fasta",
-        known_variants = 'results/{plate}/mapping/{ref}/NGSEP/vcf/{plate}_merged_variants.vcf'
+        bam=rules.map_reads.output,
+        ref=rules.copy_reference.output,
+        known_variants = rules.merge_variants_by_plate.output
     output:
-        "results/{plate}/mapping/{ref}/NGSEP/vcf/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz"
-        
+        "results/{plate}/variant_calling/NGSEP/{ref}/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz"
     params:
         params = " ".join(["-{param} {value}".format(param=i_param, value = config['NGSEP']['SingleSampleVariantsDetector'][i_param]) for i_param in config['NGSEP']['SingleSampleVariantsDetector'].keys()]),
         mem = "-Xmx3g",
@@ -60,7 +59,7 @@ rule single_sample_variant_detector_two:
     resources:
          mem_mb=3000
     log:
-        "results/{plate}/mapping/{ref}/NGSEP/vcf/second_variant_call_plate/{sample}_bwa_NGSEP.log"
+        "results/{plate}/variant_calling/NGSEP/{ref}/log/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
@@ -76,7 +75,7 @@ rule single_sample_variant_detector_two:
 rule merge_vcfs_by_plate:
     input:
         vcfs = get_sample_vcfs_by_plate_merge_vcfs,
-        ref_list = "resources/{ref}.fasta.fai"
+        ref_list = rules.genome_faidx.output
     params:
          mem = "-Xmx40g"
     resources:
@@ -84,10 +83,9 @@ rule merge_vcfs_by_plate:
     conda:
         "../envs/NGSEP.yaml"
     output:
-        'results/{plate}/mapping/{ref}/NGSEP/vcf/{plate}_merged.vcf.gz'
+        "results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz"
     log:
-        'results/{plate}/mapping/{ref}/NGSEP/vcf/{plate}_merged.log'
-
+        "results/{plate}/variant_calling/NGSEP/{ref}/log/merge_vcfs/{plate}_merged.log"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \

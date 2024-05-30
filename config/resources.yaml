@@ -12,6 +12,6 @@ bwa_mem:
 GATK:
   HaplotypeCaller:
     threads: 4
-    mem: 1024
+    mem: 7000
   CombineGVCFs:
-    mem: 1024
+    mem: 10240

@@ -40,3 +40,12 @@ GATK:
       - "--do-not-run-physical-phasing"
   CombineGVCFs:
     G: ["StandardAnnotation", "StandardHCAnnotation"]
+  GenomicsDBImport:
+    genomicsdb-shared-posixfs-optimizations: true
+    batch-size: 25
+  GenotypeGVCFs:
+    interval_length: 1000000
+    max-alternate-alleles: 4
+    seconds-between-progress-updates: 60
+    extra: ["--only-output-calls-starting-in-intervals"]
+

@@ -73,13 +73,13 @@ def get_trimmed_reads(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
     if not pd.isna(fastqs.fq2):
         return expand(
-            "results/{plate}/reads/trimmed/paired/{sample}.{group}.fastq.gz",
+            "results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
             group = [1,2],
             **wildcards
         )
     else:
         return expand(
-            "results/{plate}/reads/trimmed/single/{sample}.fastq.gz",
+            "results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
             **wildcards
         )
 
@@ -100,16 +100,6 @@ def get_big_temp(wildcards):
     else:
         return tempfile.gettempdir()
 
-def get_sample_by_plate_test(ref, plate):
-    plate_df = sample_units[sample_units['plate'] == plate]
-    vcfs = list()
-    for n, row in plate_df.iterrows():
-        i_vcf = 'results/{plate}/mapping/{ref}/bwa/mapping/{sample}.sorted.bam'.format(plate=row.plate, 
-                                                                                 sample=row.line_id,
-                                                                                 ref=ref)
-        vcfs.append(i_vcf)
-    return vcfs
-
 def get_reference_fasta(wildcards):
     return(references.loc[wildcards.ref, "ref_path"])
 
@@ -119,7 +109,7 @@ def get_sample_vcfs_by_plate_merge_variants(wildcards):
     sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
     sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
 
-    vcfs = expand("results/{plate}/mapping/{ref}/NGSEP/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
+    vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
         plate = wildcards.plate,
         ref = wildcards.ref,
         sample = sample_names )
@@ -130,7 +120,7 @@ def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
     sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
     sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
 
-    vcfs = expand("results/{plate}/mapping/{ref}/NGSEP/vcf/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
+    vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
         plate = wildcards.plate,
         ref = wildcards.ref,
         sample = sample_names )
@@ -150,16 +140,103 @@ def get_GATK_CombineGVCFs_params():
     annot = ' '.join(["-G {p}".format(p=p) for p in config["GATK"]['CombineGVCFs']['G']])
     return annot
 
+def get_gvcfs_DB(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+
+    gvcfs_list = list()
+    for isample in sample_names:
+        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz'.format(
+            sample = isample,**wildcards)
+        gvcfs_list.append(gvcf)
+    return gvcfs_list
+
 def get_gvcfs_by_sample(wildcards):
-    intervals = pd.read_csv("resources/{ref}_intervals.txt".format(**wildcards), header = None)
-    gvcfs = ['results/{plate}/mapping/{ref}/GATK/gvcf/intervals/{sample}/{sample}_{interval}.g.vcf.gz'.format(
+    intervals = pd.read_csv("resources/{ref}/{ref}_intervals.txt".format(**wildcards), header = None)
+    gvcfs = ['results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{interval}/{sample}_{interval}.g.vcf.gz'.format(
         interval = i[0],
         **wildcards) for n,i in intervals.iterrows()]
     return gvcfs
+
+def get_GenomicsDBImport_params():
+    params = ""
+    for param in config['GATK']['GenomicsDBImport'].keys():
+        if type(config['GATK']['GenomicsDBImport'][param]) != list:
+            params += "--{param} {value} ".format(param = param,
+                value = config['GATK']['GenomicsDBImport'][param]
+            )
+        else:
+            for option in config['GATK']['GenomicsDBImport'][param]:
+                params += "{option} ".format(option = option)
+    return params
+
+def get_GenotypeGVCFs_params():
+    params = ""
+    for param in config['GATK']['GenotypeGVCFs'].keys():
+        if param != "interval_length":
+            if type(config['GATK']['GenotypeGVCFs'][param]) != list:
+                params += "--{param} {value} ".format(param = param,
+                    value = config['GATK']['GenotypeGVCFs'][param])
+            else:
+                for option in config['GATK']['GenotypeGVCFs'][param]:
+                    params += "{option} ".format(option = option)
+    return params
+
+def create_intervals(start, end, interval_size):
+    intervals = []
+    current = start
+
+    while current < end:
+        next_value = min(current + interval_size, end)
+        intervals.append((current, next_value - 1))
+        current = next_value
+
+    # Handle the remaining value if it exists
+    if current == end:
+        pass
+    else:
+        intervals.append((current, end))
+
+    return intervals
+
+
+def get_interval_raw_vcfs(wildcards):
+    
+    # Read genome fai to infer the intervals
+    #fai = "resources/{ref}/{ref}.fasta.fai".format(**wildcards)
+    fai = "resources/{ref}/{ref}.fasta.fai".format(**wildcards)
+    # Open the file in read mode
+    with open(fai, 'r') as file:
+        # Read all lines from the file
+        lines = file.readlines()
+    file.close()
+    
+    intervals_list = list()
+    # Print each line
+    for line in lines:
+        data = line.strip().split('\t')
+        chrom = data[0]
+        length = int(data[1])
+        
+        intervals = create_intervals(1,length, int(config['GATK']['GenotypeGVCFs']['interval_length']))
+
+        vcfs = ["results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz".format(
+            chrom = chrom,
+            interval_i = str(i[0]),
+            interval_e = str(i[1]),
+            **wildcards
+        ) for i in intervals]
+
+        intervals_list.extend(vcfs)
+    print(intervals_list)
+    return intervals_list
 
 
 wildcard_constraints:
     sq_unit = "|".join(sequencing_units['sequencing_unit_id'].unique()),
     plate="|".join(sample_units['plate'].unique()),
     sample="|".join(sample_units['line_id'].unique()),
-    ref = "|".join(references.index)
+    ref = "|".join(references.index),
+    interval_i = "\d+",
+    interval_e = "\d+",

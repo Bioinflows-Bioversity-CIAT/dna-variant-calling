@@ -2,7 +2,8 @@ include: "rules/common.smk"
 
 rule all:
     input:
-        vcf = "results/44/mapping/v21/NGSEP/vcf/44_merged.vcf.gz"
+        vcf = "results/44/mapping/v21/NGSEP/vcf/44_merged.vcf.gz",
+        DB = expand("results/44/mapping/v21/GATK/DB/{chrom}/DB_{chrom}", chrom = ['Chr01','Chr02','Chr03','Chr04','Chr05','Chr06','Chr07','Chr08','Chr09','Chr10','Chr11'])
 
 # Modules
 include: "rules/ref.smk"
