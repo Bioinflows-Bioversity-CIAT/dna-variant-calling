@@ -15,7 +15,7 @@ rule map_reads:
         tmpdir = get_big_temp
     threads: resources['bwa_mem']['threads']
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/bwa/mem"
+        "v3.10.2/bio/bwa/mem"
         
 
 rule samtools_index:
@@ -29,4 +29,4 @@ rule samtools_index:
         extra="",  # optional params string
     threads: 4  # This value - 1 will be sent to -@
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/samtools/index"
+        "v3.10.2/bio/samtools/index"

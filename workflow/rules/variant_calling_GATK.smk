@@ -17,7 +17,7 @@ rule haplotype_caller_gvcf:
     resources:
         mem_mb=resources["GATK"]["HaplotypeCaller"]['mem'],
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/gatk/haplotypecaller"
+        "v3.10.2/bio/gatk/haplotypecaller"
 
 rule combine_by_sample_gvcfs:
     input:
@@ -32,7 +32,7 @@ rule combine_by_sample_gvcfs:
     resources:
         mem_mb=resources['GATK']['CombineGVCFs']['mem'],
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/gatk/combinegvcfs"
+        "v3.10.2/bio/gatk/combinegvcfs"
 
 
 rule genomics_db_import:
@@ -49,7 +49,7 @@ rule genomics_db_import:
     resources:
         mem_mb=34000,
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/gatk/genomicsdbimport"
+        "v3.10.2/bio/gatk/genomicsdbimport"
 
 
 rule genotype_gvcfs:
@@ -68,7 +68,7 @@ rule genotype_gvcfs:
     resources:
         mem_mb=1024
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/gatk/genotypegvcfs"
+        "v3.10.2/bio/gatk/genotypegvcfs"
 
 
 rule bcftools_concat:
@@ -86,4 +86,4 @@ rule bcftools_concat:
     resources:
         mem_mb=10240,
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/bcftools/concat"
+        "v3.10.2/bio/bcftools/concat"

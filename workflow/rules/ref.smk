@@ -15,7 +15,7 @@ checkpoint genome_faidx:
         "resources/{ref}/{ref}.fasta.fai"
     cache: True
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/samtools/faidx"
+        "v3.10.2/bio/samtools/faidx"
 
 rule bwa_index:
     input:
@@ -27,7 +27,7 @@ rule bwa_index:
     params:
         algorithm="bwtsw",
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/bwa/index"
+        "v3.10.2/bio/bwa/index"
 
 checkpoint get_intervals:
     input:
@@ -54,4 +54,4 @@ rule create_dict:
     resources:
         mem_mb=1024,
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/picard/createsequencedictionary"
+        "v3.10.2/bio/picard/createsequencedictionary"

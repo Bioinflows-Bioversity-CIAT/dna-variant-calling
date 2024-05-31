@@ -17,7 +17,7 @@ rule trim_reads_pe:
     resources:
         mem_mb=resources['trimmomatic']['mem']
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/trimmomatic/pe"
+        "v3.10.2/bio/trimmomatic/pe"
         
 rule trim_reads_se:
     input:
@@ -33,4 +33,4 @@ rule trim_reads_se:
     resources:
         mem_mb=resources['trimmomatic']['mem']
     wrapper:
-        "file:///home/scruz/software/snakemake-wrappers/bio/trimmomatic/se"
+        "v3.10.2/bio/trimmomatic/se"
