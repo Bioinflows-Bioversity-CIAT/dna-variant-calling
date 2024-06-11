@@ -63,7 +63,7 @@ def get_sample_fastq(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
     
     if not pd.isna(fastqs.fq2):
-        sample_fastq = glob.glob(checkpoint_output + "/{sample}.[1,2].fq.gz".format(sample = wildcards.sample))
+        sample_fastq = sorted(glob.glob(checkpoint_output + "/{sample}.[1,2].fq.gz".format(sample = wildcards.sample)))
         return {"r1": sample_fastq[0], "r2": sample_fastq[1]}
     else:
         sample_fastq = glob.glob(checkpoint_output + "/{sample}.fq.gz".format(sample = wildcards.sample))
@@ -73,13 +73,13 @@ def get_trimmed_reads(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
     if not pd.isna(fastqs.fq2):
         return expand(
-            "results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
+            "results/{plate}/trimming/trimmomatic/paired/{sample}_trimmed.{group}.fastq.gz",
             group = [1,2],
             **wildcards
         )
     else:
         return expand(
-            "results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
+            "results/{plate}/trimming/trimmomatic/single/{sample}_trimmed.fastq.gz",
             **wildcards
         )
 
@@ -240,3 +240,25 @@ wildcard_constraints:
     ref = "|".join(references.index),
     interval_i = "\d+",
     interval_e = "\d+",
+
+
+####################
+
+def get_input_all():
+    checkpoint_output = checkpoints.demultiplex.get(plate = "44", ref = "v21").output.outdir
+    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+
+    bams = expand("results/{plate}/mapping/bwa/{ref}/{sample}.sorted.bam",
+        plate = "44",
+        ref = "v21",
+        sample = sample_names )
+    return bams
+
+def get_sample_multiqc():
+    stacks_dir = "/home/mnarvaez/pipeline/dna-variant-calling/results/44/demultiplexing/stacks"
+    sample_list = [file for file in os.listdir(stacks_dir) if file.endswith(".fq.gz")]
+    sample_names = [file.split('.')[0] for file in sample_list]
+    return sample_names
+
+

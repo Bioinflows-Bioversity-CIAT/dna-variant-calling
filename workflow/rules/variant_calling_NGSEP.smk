@@ -83,13 +83,15 @@ rule merge_vcfs_by_plate:
     conda:
         "../envs/NGSEP.yaml"
     output:
-        "results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz"
+        vcf = "results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz",
+        index = "results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz.tbi"
     log:
         "results/{plate}/variant_calling/NGSEP/{ref}/log/merge_vcfs/{plate}_merged.log"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
-            VCFMerge  -s {input.ref_list} -o {output}.vcf {input.vcfs} 2> {log} && \
-            cat {output}.vcf | bgzip > {output} &&
-            rm {output}.vcf
+            VCFMerge  -s {input.ref_list} -o {output.vcf}.vcf {input.vcfs} 2> {log} && \
+            cat {output.vcf}.vcf | bgzip > {output.vcf} &&
+            rm {output.vcf}.vcf && \
+            tabix -p vcf {output.vcf} 
         """

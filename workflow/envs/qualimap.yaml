@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - openjdk=8.0.412
+  - qualimap=2.3
