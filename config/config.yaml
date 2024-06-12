@@ -19,7 +19,7 @@ trimmomatic:
         - "MINLEN:36"
 
 NGSEP:
-    path: /home/mnarvaez/software/NGSEPcore/NGSEPcore_5.0.0.jar
+    path: /home/scruz/software/NGSEPcore/NGSEPcore_5.0.0.jar
     SingleSampleVariantsDetector:
         h: 0.0001
         maxBaseQS: 30
@@ -50,9 +50,9 @@ GATK:
     extra: ["--only-output-calls-starting-in-intervals"]
 
 qualimap:
-  path: "/home/mnarvaez/software/qualimap_v2.3/qualimap"
+  path: "/home/scruz/software/qualimap_v2.3/qualimap"
 
 DISCVR-Seq:
-  path: "/home/mnarvaez/software/DISCVRSeq/DISCVRSeq-1.3.73.jar"
+  path: "/home/scruz/software/DISCVRSeq-1.3.73.jar"
 
 

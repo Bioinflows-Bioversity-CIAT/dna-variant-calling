@@ -1,2 +1,3 @@
 flowcell_id	lane	index	sequencing_unit_id	plate	fq1	fq2
-HF7JFCCX2	8		HF7JFCCX2-8	44	/home/mnarvaez/ngsep_test/data/GCDT_20-01_44_1.fastq.gz	/home/mnarvaez/ngsep_test/data/GCDT_20-01_44_2.fastq.gz
+HF7JFCCX2	8		HF7JFCCX2-8	44	/home/scruz/pipelines/modules/dna-variant-calling/data/GCDT_20-01_44_1.fastq.gz	/home/scruz/pipelines/modules/dna-variant-calling/data/GCDT_20-01_44_2.fastq.gz
+

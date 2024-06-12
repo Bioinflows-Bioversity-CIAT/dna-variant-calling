@@ -106,24 +106,23 @@ def get_reference_fasta(wildcards):
 
 def get_sample_vcfs_by_plate_merge_variants(wildcards):
     checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
-    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
-    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
-
+    sample_list = glob_wildcards(os.path.join(checkpoint_output, "{sample}.1.fq.gz")).sample
+    sample_list = [i for i in sample_list if '.rem' not in i]
     vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
         plate = wildcards.plate,
         ref = wildcards.ref,
-        sample = sample_names )
+        sample = sample_list )    
+    
     return vcfs
 
 def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
     checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
-    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
-    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
-
+    sample_list = glob_wildcards(os.path.join(checkpoint_output, "{sample}.1.fq.gz")).sample
+    sample_list = [i for i in sample_list if '.rem' not in i]
     vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
         plate = wildcards.plate,
         ref = wildcards.ref,
-        sample = sample_names )
+        sample = sample_list )
     return vcfs
 
 def get_GATK_HaplotypeCaller_params():
@@ -248,7 +247,6 @@ def get_input_all():
     checkpoint_output = checkpoints.demultiplex.get(plate = "44", ref = "v21").output.outdir
     sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
     sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
-
     bams = expand("results/{plate}/mapping/bwa/{ref}/{sample}.sorted.bam",
         plate = "44",
         ref = "v21",
@@ -256,9 +254,19 @@ def get_input_all():
     return bams
 
 def get_sample_multiqc():
-    stacks_dir = "/home/mnarvaez/pipeline/dna-variant-calling/results/44/demultiplexing/stacks"
+    stacks_dir = "~/pipelines/modules/dna-variant-calling/results/44/demultiplexing/stacks"
     sample_list = [file for file in os.listdir(stacks_dir) if file.endswith(".fq.gz")]
     sample_names = [file.split('.')[0] for file in sample_list]
     return sample_names
+
+def get_sample_qc_by_plate(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+    sample_list = glob_wildcards(os.path.join(checkpoint_output, "{sample}.1.fq.gz")).sample
+    sample_list = [i for i in sample_list if '.rem' not in i]
+    qcs = expand("results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/multiqc_report.html",
+        plate = wildcards.plate,
+        ref = wildcards.ref,
+        sample = sample_list )
+    return qcs
 
 

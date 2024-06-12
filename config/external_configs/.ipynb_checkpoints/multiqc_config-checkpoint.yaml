@@ -1,0 +1,9 @@
+custom_logo: "config/external_configs/Alliance-Logo.png" 
+
+intro_text: "MultiQC reports summarise analysis results."
+
+report_header_info:
+  - Contact E-mail: "mail@cgiar.org"
+  - Application Type: "GBS"
+  - Project Type: "Variant Calling"
+  - Sequencing Platform: "ILLUMINA"

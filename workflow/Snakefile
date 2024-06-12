@@ -1,19 +1,20 @@
 include: "rules/common.smk"
 
-rule all:
-    input:
-        vcf = expand("results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz",
-                        plate = "44",
-                        ref = "v21")
+#rule all:
+#    input:
+#        vcf = expand("results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz",
+#                        plate = "44",
+#                        ref = "v21")
 #         bams = get_input_all(),
 #         DB = expand("results/44/mapping/v21/GATK/DB/{chrom}/DB_{chrom}", chrom = ['Chr01','Chr02','Chr03','Chr04','Chr05','Chr06','Chr07','Chr08','Chr09','Chr10','Chr11'])
 
-# rule all:
+#rule all:
 #     input:
-#         expand("results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/multiqc_report.html",
+#        sample_qc = #expand("results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/multiqc_report.html",
 #                plate="44",
-#                ref="v21",
-#                sample=get_sample_multiqc())
+#                ref="UI-111",
+#                sample=get_sample_multiqc()),
+#        merged_qc = "results/44/quality_check/UI-111/viariantqc/variantqc.html"
 
 # Modules
 include: "rules/ref.smk"

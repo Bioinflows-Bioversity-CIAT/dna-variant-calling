@@ -77,7 +77,7 @@ rule multiqc:
         samtools="results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/{sample}.sorted.bam.stats",
         qualimap="results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/{sample}",
         bcftools="results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/{sample}.vcf.stats",
-        config = "/home/mnarvaez/pipeline/dna-variant-calling/data/multiqc_config.yaml"
+        config = "config/external_configs/multiqc_config.yaml"
     output:
         html="results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/multiqc_report.html",
         data_dir=directory("results/{plate}/quality_check/{ref}/multiqc_report_per_sample/{sample}/multiqc_data")
@@ -111,3 +111,17 @@ rule merged_vcf_stats:
         """
         java -jar {config[DISCVR-Seq][path]} VariantQC -R {input.ref} -V {input.vcf} -O {output}
         """
+rule get_merged_qc:
+    input:
+        merged_qc = "results/{plate}/quality_check/{ref}/viariantqc/variantqc.html",
+        
+rule get_sample_qc:
+    input:    
+        sample_qc = get_sample_qc_by_plate
+    output:
+        directory("results/{plate}/quality_check/{ref}/per_sample")
+    shell:
+        """
+        mv {input} {output}
+        """
+        

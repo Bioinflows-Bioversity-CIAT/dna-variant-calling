@@ -1,2 +1,2 @@
 ref_name	ref_path	STR_path
-v21	/home/mnarvaez/ngsep_test/data/ref/Pvulgaris_442_v2.0.fa	/home/mnarvaez/ngsep_test/data/ref/pv21_STR.ngs
+UI-111	/home/scruz/pipelines/dna_seq_gbs_variant_calling/resources/UI_111.fasta	
