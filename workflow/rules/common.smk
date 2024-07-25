@@ -73,13 +73,15 @@ def get_trimmed_reads(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
     if not pd.isna(fastqs.fq2):
         return expand(
-            "results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
+            "{basedir}/results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
+            basedir = basedir,
             group = [1,2],
             **wildcards
         )
     else:
         return expand(
-            "results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
+            "{basedir}/results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
+            basedir = basedir,
             **wildcards
         )
 
@@ -109,7 +111,8 @@ def get_sample_vcfs_by_plate_merge_variants(wildcards):
     sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
     sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
 
-    vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
+    vcfs = expand("{basedir}/results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
+        basedir = basedir,
         plate = wildcards.plate,
         ref = wildcards.ref,
         sample = sample_names )
@@ -120,7 +123,8 @@ def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
     sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
     sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
 
-    vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
+    vcfs = expand("{basedir}/results/{plate}/variant_calling/NGSEP/{ref}/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
+        basedir = basedir,
         plate = wildcards.plate,
         ref = wildcards.ref,
         sample = sample_names )
@@ -147,14 +151,17 @@ def get_gvcfs_DB(wildcards):
 
     gvcfs_list = list()
     for isample in sample_names:
-        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz'.format(
-            sample = isample,**wildcards)
+        gvcf = '{basedir}/results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz'.format(
+            basedir = basedir,
+            sample = isample,
+            **wildcards)
         gvcfs_list.append(gvcf)
     return gvcfs_list
 
 def get_gvcfs_by_sample(wildcards):
     intervals = pd.read_csv("resources/{ref}/{ref}_intervals.txt".format(**wildcards), header = None)
-    gvcfs = ['results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{interval}/{sample}_{interval}.g.vcf.gz'.format(
+    gvcfs = ['{basedir}/results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{interval}/{sample}_{interval}.g.vcf.gz'.format(
+        basedir = basedir,
         interval = i[0],
         **wildcards) for n,i in intervals.iterrows()]
     return gvcfs
@@ -221,7 +228,8 @@ def get_interval_raw_vcfs(wildcards):
         
         intervals = create_intervals(1,length, int(config['GATK']['GenotypeGVCFs']['interval_length']))
 
-        vcfs = ["results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz".format(
+        vcfs = ["{basedir}/results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz".format(
+            basedir = basedir,
             chrom = chrom,
             interval_i = str(i[0]),
             interval_e = str(i[1]),

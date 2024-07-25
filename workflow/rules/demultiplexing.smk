@@ -1,6 +1,6 @@
 rule get_barcodemap:
     output:
-        barcodemap = "results/{plate}/demultiplexing/barcodemap.tsv"
+        barcodemap = f"{basedir}/results/{{plate}}/demultiplexing/barcodemap.tsv"
     input:
         unpack(get_demultiplex_fastqs)
     run:
@@ -12,8 +12,8 @@ rule get_barcodemap:
 
 checkpoint demultiplex:
     output: 
-        outdir = directory("results/{plate}/demultiplexing/stacks"),
-        logfile = "results/{plate}/demultiplexing/process_radtags.data.log"
+        outdir = directory(f"{basedir}/results/{{plate}}/demultiplexing/stacks"),
+        logfile = f"{basedir}/results/{{plate}}/demultiplexing/process_radtags.data.log"
     input: 
         unpack(get_demultiplex_fastqs),
         barcodemap = rules.get_barcodemap.output,
@@ -24,7 +24,7 @@ checkpoint demultiplex:
     threads:
         resources['stacks']['process_radtags']['threads']
     log:
-        "results/{plate}/demultiplexing/log/stacks/demultiplexing.log"
+        f"{basedir}/results/{{plate}}/demultiplexing/log/stacks/demultiplexing.log"
     conda:
         "../envs/demultiplexing.yaml"
     shell:

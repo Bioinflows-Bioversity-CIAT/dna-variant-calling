@@ -3,9 +3,9 @@ rule map_reads:
         reads = get_trimmed_reads,
         idx = rules.bwa_index.output,
     output:
-        "results/{plate}/mapping/bwa/{ref}/{sample}.sorted.bam"
+        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sorted.bam"
     log:
-        "results/{plate}/mapping/bwa/{ref}/log/bwa_{sample}.log"
+        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/log/bwa_{{sample}}.log"
     params:
         index=lambda w, input: os.path.splitext(input.idx[0])[0],
         extra=get_read_group,
@@ -22,9 +22,9 @@ rule samtools_index:
     input:
         rules.map_reads.output,
     output:
-        "results/{plate}/mapping/bwa/{ref}/{sample}.sorted.bam.bai"
+        f"results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sorted.bam.bai"
     log:
-        "results/{plate}/mapping/bwa/{ref}/log/index_bam_{sample}.log",
+        f"results/{{plate}}/mapping/bwa/{{ref}}/log/index_bam_{{sample}}.log",
     params:
         extra="",  # optional params string
     threads: 4  # This value - 1 will be sent to -@
