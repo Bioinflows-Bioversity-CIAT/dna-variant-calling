@@ -244,7 +244,7 @@ def get_readpos_files(wildcards):
     checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
 
     plate_df = sequencing_units.loc[wildcards.plate]
-    samples_df = samples[samples['sequencing_unit_id'] == plate_df['sequencing_unit_id']]
+    samples_df = sample_units[sample_units['sequencing_unit_id'] == plate_df['sequencing_unit_id']]
     sample_names = samples_df['line_id'].tolist()
     readpos_files = expand([
         "{basedir}/results/{plate}/mapping/bwa/{ref}/readpos_stats/{sample}_readpos.stats",
@@ -278,7 +278,7 @@ def get_multiqc_files(wildcards):
     checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
     
     plate_df = sequencing_units.loc[wildcards.plate]
-    samples_df = samples[samples['sequencing_unit_id'] == plate_df['sequencing_unit_id']]
+    samples_df = sample_units[sample_units['sequencing_unit_id'] == plate_df['sequencing_unit_id']]
     sample_names = samples_df['line_id'].tolist()
     multiqc_files = expand([
         "{basedir}/results/{plate}/mapping/bwa/{ref}/samtools-stats/{sample}.txt"],basedir = basedir, sample = sample_names, plate = wildcards.plate, ref = wildcards.ref)

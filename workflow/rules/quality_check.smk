@@ -39,6 +39,8 @@ rule qual_stats_read_pos:
         f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/readpos_stats/{{sample}}_readpos.stats"
     params:
         mem = "-Xmx3g"
+    conda:
+        "../envs/NGSEP.yaml"  
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} BasePairQualStats \
@@ -139,7 +141,8 @@ rule multiqc:
     input: 
         get_multiqc_files
     output:
-        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/multiqc.html"
+        html=f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/multiqc.html",
+        data_dir=directory(f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/multiqc_data")
     params: 
         use_input_files_only=True
     log:
@@ -149,24 +152,25 @@ rule multiqc:
 
 rule plate_mapping_stats:
     input:
-        mapping_stats = f'{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/multiqc_data/multiqc_general_stats.txt'
+        mapping_stats = f'{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/multiqc_data'
     output:
         plate_stats_plot = f'{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/plate_stats_plot.pdf',
     run:
         import matplotlib.pyplot as plt
         import pandas as pd
         import seaborn as sns
-        
+        import numpy as np
         barcodes = pd.read_csv(config['barcodes'])
         
-        mapping_stats = pd.read_csv(input.mapping_stats, sep='\t')
+        mapping_stats = pd.read_csv(input.mapping_stats + "/multiqc_general_stats.txt", sep='\t')
         mapping_stats.rename(columns = {'Sample': 'line_id'}, inplace = True)
-        mapping_stats['log_total_reads'] = np.log(mapping_stats['Samtools_mqc-generalstats-samtools-raw_total_sequences']+1)
-        mapping_responses = ['log_total_reads',
-                            'Samtools_mqc-generalstats-samtools-reads_mapped_percent',
-                            'Samtools_mqc-generalstats-samtools-error_rate']
+        mapping_stats['log_MQ0'] = mapping_stats['Samtools: stats_mqc-generalstats-samtools_stats-reads_MQ0_percent']+1
+        mapping_responses = ['log_MQ0',
+                            'Samtools: stats_mqc-generalstats-samtools_stats-reads_mapped_percent',
+                            'Samtools: stats_mqc-generalstats-samtools_stats-error_rate']
+                            
         
-        plate_data = samples.merge(barcodes, on = 'barcode')
+        plate_data = sample_units.merge(barcodes, on = 'barcode')
         plate_data = plate_data.merge(mapping_stats, on = 'line_id' )
         
         
@@ -235,3 +239,36 @@ rule plate_snp_stats:
         plt.suptitle(wildcards.plate + " ref:" + wildcards.ref)
         plt.tight_layout()
         plt.savefig(output.plate_stats_plot)
+
+
+rule bcf_stats:
+    input:
+        f"{basedir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/second_variant_call_plate/{{sample}}_bwa_NGSEP.vcf.gz"
+    output:
+        f'{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/by_sample/bcftools/{{sample}}.vcf.stats'
+    log:
+        f'{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/by_sample/bcftools/log/{{sample}}.vcf.stats.log'
+    params:
+        "",
+    wrapper:
+        "file:///home/scruz/software/snakemake-wrappers/bio/bcftools/stats"
+
+
+rule multiqc_by_sample:
+    input:
+        samtools=f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/samtools-stats/{{sample}}.txt",
+        bcftools=f'{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/by_sample/bcftools/{{sample}}.vcf.stats'
+    output:
+        html=f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/by_sample/multiqc/{{sample}}/{{sample}}.multiqc_report.html",
+        data_dir=directory(f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/by_sample/multiqc/{{sample}}/multiqc_data")
+    params:
+        extra=lambda wildcards: "-i 'Quality report for sample {sample}'".format(sample=wildcards.sample),
+        use_input_files_only=True,
+    log:
+        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/stats/by_sample/multiqc/{{sample}}/{{sample}}.multiqc.log",
+    threads: 4
+    resources:
+        mem_mb=1024
+    wrapper:
+        "file:///home/scruz/software/snakemake-wrappers/bio/multiqc"
+

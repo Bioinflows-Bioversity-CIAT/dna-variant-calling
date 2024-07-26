@@ -9,6 +9,11 @@ rule all:
           qual = "40",
           dp = "5",
           maf = "0.05"),
+        read_pos = expand('{basedir}/results/{plate}/mapping/bwa/{ref}/stats/plate_stats_plot.pdf',
+            basedir = basedir,
+            plate = [46,47,48,49,50],
+            ref="UI111"
+        )
 
 # Modules
 include: "rules/ref.smk"
