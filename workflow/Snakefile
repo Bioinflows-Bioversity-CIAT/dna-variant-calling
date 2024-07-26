@@ -2,7 +2,13 @@ include: "rules/common.smk"
 
 rule all:
     input:
-        vcf = expand("results/{plate}/variant_calling/NGSEP/{ref}/{plate}_merged.vcf.gz", plate = [46,47,48,49,50], ref="UI111"),
+        vcf = expand("{basedir}/results/{plate}/mapping/bwa/{ref}/stats/{plate}_merged_Q{qual}_Dp{dp}_MAF{maf}_stats_plot.pdf",
+        basedir = basedir,
+         plate = [46,47,48,49,50],
+          ref="UI111",
+          qual = "40",
+          dp = "5",
+          maf = "0.05"),
 
 # Modules
 include: "rules/ref.smk"
@@ -11,3 +17,5 @@ include: "rules/read_trimming.smk"
 include: "rules/mapping.smk"
 include: "rules/variant_calling_NGSEP.smk"
 include: "rules/variant_calling_GATK.smk"
+include: "rules/quality_check.smk"
+include: "rules/filter.smk"

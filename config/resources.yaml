@@ -1,3 +1,10 @@
+###
+# quality check rules
+###
+fastqc:
+    library: 10
+    sample: 2
+    
 stacks:
   process_radtags:
     threads: 50

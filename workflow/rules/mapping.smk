@@ -22,9 +22,9 @@ rule samtools_index:
     input:
         rules.map_reads.output,
     output:
-        f"results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sorted.bam.bai"
+        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sorted.bam.bai"
     log:
-        f"results/{{plate}}/mapping/bwa/{{ref}}/log/index_bam_{{sample}}.log",
+        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/log/index_bam_{{sample}}.log",
     params:
         extra="",  # optional params string
     threads: 4  # This value - 1 will be sent to -@

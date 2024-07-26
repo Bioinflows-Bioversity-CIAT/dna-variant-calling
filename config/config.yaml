@@ -1,7 +1,7 @@
 sequencing_units: config/sequencing_units.tsv
 sample_units: config/samples.tsv
 references: config/references.tsv
-
+barcodes: /home/scruz/workflows/dna-variant-calling/resources/GBS_wells_adapters.csv
 resources_config: config/resources.yaml
 
 demultiplexing:

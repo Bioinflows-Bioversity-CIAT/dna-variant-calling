@@ -7,7 +7,7 @@ import random
 import string
 
 min_version("5.18.0")
-
+basedir = "/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/VXS"
 # Config params
 configfile: "config/config.yaml"
 
@@ -240,7 +240,49 @@ def get_interval_raw_vcfs(wildcards):
     print(intervals_list)
     return intervals_list
 
+def get_readpos_files(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
 
+    plate_df = sequencing_units.loc[wildcards.plate]
+    samples_df = samples[samples['sequencing_unit_id'] == plate_df['sequencing_unit_id']]
+    sample_names = samples_df['line_id'].tolist()
+    readpos_files = expand([
+        "{basedir}/results/{plate}/mapping/bwa/{ref}/readpos_stats/{sample}_readpos.stats",
+    ],basedir = basedir, sample = sample_names, plate = wildcards.plate, ref = wildcards.ref)
+    return readpos_files
+
+def get_plate_efficiencies(wildcards):
+    
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+
+    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    
+    samtools_stats = expand([
+        "{basedir}/results/{plate}/mapping/bwa/{ref}/samtools-stats/{sample}.txt",
+    ], basedir = basedir, sample = sample_names, plate = wildcards.plate, ref=wildcards.ref)
+    
+    stacks_log = "{basedir}/results/{plate}/demultiplexing/process_radtags.data.log".format( basedir = basedir, plate = wildcards.plate)
+    return {"samtools_stats": samtools_stats, "stacks_log": stacks_log}
+
+def get_library_fastqc(wildcards):
+    fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
+    if wildcards.group == 'R1':
+        return fastqs.fq1
+    elif wildcards.group == 'R2':
+        return fastqs.fq2
+    else:
+        print("UNEXPECTED BEHAVIOR")
+
+def get_multiqc_files(wildcards):
+    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+    
+    plate_df = sequencing_units.loc[wildcards.plate]
+    samples_df = samples[samples['sequencing_unit_id'] == plate_df['sequencing_unit_id']]
+    sample_names = samples_df['line_id'].tolist()
+    multiqc_files = expand([
+        "{basedir}/results/{plate}/mapping/bwa/{ref}/samtools-stats/{sample}.txt"],basedir = basedir, sample = sample_names, plate = wildcards.plate, ref = wildcards.ref)
+    return multiqc_files
 wildcard_constraints:
     sq_unit = "|".join(sequencing_units['sequencing_unit_id'].unique()),
     plate="|".join(sample_units['plate'].unique()),
@@ -248,3 +290,6 @@ wildcard_constraints:
     ref = "|".join(references.index),
     interval_i = "\d+",
     interval_e = "\d+",
+    maf = "|".join(['0.05']),
+    dp = "|".join([str(d) for d in range(1,20)]),
+    qual = "|".join([str(q) for q in range(1,60)]),
