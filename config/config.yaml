@@ -41,11 +41,14 @@ GATK:
   CombineGVCFs:
     G: ["StandardAnnotation", "StandardHCAnnotation"]
   GenomicsDBImport:
-    genomicsdb-shared-posixfs-optimizations: true
+    genomicsdb-shared-posixfs-optimizations: TRUE
     batch-size: 25
   GenotypeGVCFs:
     interval_length: 1000000
     max-alternate-alleles: 4
     seconds-between-progress-updates: 60
     extra: ["--only-output-calls-starting-in-intervals"]
-
+  SelectVariants:
+    select-type-to-include: SNP
+    restrict-alleles-to: BIALLELIC
+    exclude-filtered: TRUE

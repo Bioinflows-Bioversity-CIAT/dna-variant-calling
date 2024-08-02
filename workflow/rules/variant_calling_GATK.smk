@@ -42,7 +42,7 @@ rule combine_gvcfs:
         'results/{plate}/variant_calling/GATK/{ref}/log/CombineGVCFs/{sample}.log'
     params:
         # Extra parameters for GATK CombineGVCFs
-        extra = get_GATK_CombineGVCFs_params() # Optional
+        extra = get_GATK_CombineGVCFs_params()
     resources:
         # Memory allocation for CombineGVCFs
         mem_mb = resources['GATK']['CombineGVCFs']['mem']
@@ -62,7 +62,7 @@ rule genomics_db_import:
         'results/{plate}/variant_calling/GATK/{ref}/log/GenomicsDBImport/{chrom}.log'
     params:
         # Extra parameters for GATK GenomicsDBImport
-        extra = get_GenomicsDBImport_params(),  # Optional
+        extra = get_GenomicsDBImport_params(),
         # Interval for GenomicsDBImport, typically a chromosome
         intervals = lambda wildcards: "{interval}".format(interval = wildcards.chrom)
     threads: 4
@@ -87,10 +87,9 @@ rule genotype_gvcfs:
         'results/{plate}/variant_calling/GATK/{ref}/log/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.log'
     params:
         # Extra parameters for GATK GenotypeGVCFs
-        extra = get_GenotypeGVCFs_params(), # Optional
+        extra = get_GenotypeGVCFs_params(),
         # Interval for GenotypeGVCFs, specified as chromosome and range
-        intervals = lambda wildcards: "{chrom}:{interval_i}-{interval_e}".format(										chrom = wildcards.chrom, 																			interval_i = wildcards.interval_i,																	interval_e = wildcards.interval_e
-        )
+        intervals = lambda wildcards: "{chrom}:{interval_i}-{interval_e}".format(chrom = wildcards.chrom, interval_i = wildcards.interval_i, interval_e = wildcards.interval_e)
     resources:
         # Memory allocation for GenotypeGVCFs
         mem_mb = 1024
@@ -121,7 +120,7 @@ rule bcftools_concat:
         mem_mb = 10240
     wrapper:
         # The wrapper for bcftools concat
-        "v3.10.2/bio/bcftools/concat"
+        "v3.14.0/bio/bcftools/concat"
 
 rule select_variants:
     input:
@@ -131,16 +130,16 @@ rule select_variants:
         ref = rules.copy_reference.output
     output:
         # Output VCF file with selected biallelic variants
-        biallelic_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.vcf.gz"
+        biallelic_snp_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.snp.vcf.gz"
     log:
         # Log file for the SelectVariants process
         'results/{plate}/variant_calling/GATK/{ref}/log/SelectVariants/{plate}.log'
     params:
         # Optional extra parameters for GATK SelectVariants
-        extra = get_GATK_SelectVariants_params() # Optional
+        extra = get_GATK_SelectVariants_params()
     resources:
         # Memory allocation for the rule
-        mem_mb = 1024,
+        mem_mb = 10240
     wrapper:
         # The wrapper for GATK SelectVariants
         "v3.14.0/bio/gatk/selectvariants"
@@ -148,23 +147,21 @@ rule select_variants:
 rule variant_filtering:
     input:
         # Input VCF file from SelectVariants
-        biallelic_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.vcf.gz",
+        biallelic_snp_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.snp.vcf.gz",
         # Reference genome file
         ref = rules.copy_reference.output
     output:
         # Output hard-filtered VCF file
-        hardfiltered_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.hardfiltered.vcf.gz"
+        hardfiltered_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.hardfiltered.snp.vcf.gz"
     log:
         # Log file for the VariantFiltration process
         'results/{plate}/variant_calling/GATK/{ref}/log/VariantFiltration/{plate}.log'
     params:
         # Filters for VariantFiltration (could be expanded for clarity or flexibility)
-        filters = {"myfilter": "QD = 2.0 || MQ = 40.0 || FS = 60.0 || SOR = 3.0 || MQR = -12.5 || RPR = -8.0"},
-        # Optional extra parameters for GATK VariantFiltration
-        extra = get_GATK_VariantFiltration_params() # Optional
+        filters = {"myfilter": "QD = 2.0 || MQ = 40.0 || FS = 60.0 || SOR = 3.0 || MQR = -12.5 || RPR = -8.0"}
     resources:
         # Memory allocation for the rule
-        mem_mb = 1024
+        mem_mb = 10240
     wrapper:
         # The wrapper for GATK VariantFiltration
         "v3.14.0/bio/gatk/variantfiltration"
