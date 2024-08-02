@@ -261,8 +261,8 @@ wildcard_constraints:
     plate="|".join(sample_units['plate'].unique()),
     sample="|".join(sample_units['line_id'].unique()),
     ref = "|".join(references.index),
-    interval_i = "\d+",
-    interval_e = "\d+",
+    interval_i = r"\d+",
+    interval_e = r"\d+"
 
 # ---------------------------------------------------------------------------------------------
 def get_SelectVariants_params():

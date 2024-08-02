@@ -10,8 +10,7 @@ rule haplotype_caller:
         genome_dict = rules.create_dict.output
     output:
         # Output GVCF file for the specified sample and chromosome
-        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/
-        intervals/{chrom}/{sample}_{chrom}.g.vcf.gz'
+        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{chrom}/{sample}_{chrom}.g.vcf.gz'
     log:
         # Log file for HaplotypeCaller process
         'results/{plate}/variant_calling/GATK/{ref}/log/HaplotyeCaller/{chrom}/{sample}_{chrom}.log'
@@ -25,7 +24,7 @@ rule haplotype_caller:
         # Number of threads to use, defined in the resources dictionary
         mem_mb = resources["GATK"]["HaplotypeCaller"]['mem']
     wrapper:
-        # Memory allocation for HaplotypeCaller
+        # Wrapper for GATK HaplotypeCaller
         "v3.10.2/bio/gatk/haplotypecaller"
 
 rule combine_gvcfs:
@@ -89,7 +88,11 @@ rule genotype_gvcfs:
         # Extra parameters for GATK GenotypeGVCFs
         extra = get_GenotypeGVCFs_params(),
         # Interval for GenotypeGVCFs, specified as chromosome and range
-        intervals = lambda wildcards: "{chrom}:{interval_i}-{interval_e}".format(chrom = wildcards.chrom, interval_i = wildcards.interval_i, interval_e = wildcards.interval_e)
+        intervals = lambda wildcards: "{chrom}:{interval_i}-{interval_e}".format(
+            chrom = wildcards.chrom, 
+            interval_i = wildcards.interval_i, 
+            interval_e = wildcards.interval_e
+        )
     resources:
         # Memory allocation for GenotypeGVCFs
         mem_mb = 1024
@@ -99,15 +102,15 @@ rule genotype_gvcfs:
 
 rule bcftools_concat:
     input:
-    	# A function or list of VCF files to be concatenated
+        # A function or list of VCF files to be concatenated
         calls = get_interval_raw_vcfs,
         # The reference index file
         fai = rules.genome_faidx.output 
     output:
-    	# The output concatenated VCF file
+        # The output concatenated VCF file
         vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz"
     log:
-    	# Log file for the concatenation process
+        # Log file for the concatenation process
         'results/{plate}/variant_calling/GATK/{ref}/log/bcftools_merge/{plate}.log'
     params:
         # Parameter to control if the output should be uncompressed BCF format
@@ -125,7 +128,7 @@ rule bcftools_concat:
 rule select_variants:
     input:
         # Input raw VCF file from bcftools concat
-        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz"",
+        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz",
         # Reference genome file
         ref = rules.copy_reference.output
     output:
@@ -136,7 +139,7 @@ rule select_variants:
         'results/{plate}/variant_calling/GATK/{ref}/log/SelectVariants/{plate}.log'
     params:
         # Optional extra parameters for GATK SelectVariants
-        extra = get_GATK_SelectVariants_params()
+        extra = get_SelectVariants_params()
     resources:
         # Memory allocation for the rule
         mem_mb = 10240
