@@ -1,170 +1,123 @@
+# Rule for running GATK HaplotypeCaller
 rule haplotype_caller:
     input:
-        # Single or list of bam files
-        bam = rules.map_reads.output,
-        # Index file for BAM
-        bai = rules.samtools_index.output,
-        # Reference genome file
-        ref = rules.copy_reference.output,
-        # Genome dictionary file
-        genome_dict = rules.create_dict.output
+        bam = rules.map_reads.output,  # BAM file
+        bai = rules.samtools_index.output,  # BAM index file
+        ref = rules.copy_reference.output,  # Reference genome
+        genome_dict = rules.create_dict.output  # Genome dictionary
     output:
-        # Output GVCF file for the specified sample and chromosome
-        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{chrom}/{sample}_{chrom}.g.vcf.gz'
+        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/HaplotypeCaller/intervals/{chrom}/{sample}_{chrom}.g.vcf.gz'  # GVCF output
     log:
-        # Log file for HaplotypeCaller process
-        'results/{plate}/variant_calling/GATK/{ref}/log/HaplotyeCaller/{chrom}/{sample}_{chrom}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/HaplotypeCaller/{chrom}/{sample}_{chrom}.log'  # Log file
     params:
-        # Extra parameters for GATK HaplotypeCaller
-        extra = get_GATK_HaplotypeCaller_params(),
-        # Interval for HaplotypeCaller, typically a chromosome
-        intervals = lambda wildcards: f"{wildcards.chrom}"
-    threads: resources["GATK"]["HaplotypeCaller"]['threads']
+        extra = get_GATK_HaplotypeCaller_params(),  # Extra parameters
+        intervals = lambda wildcards: f"{wildcards.chrom}"  # Intervals (chromosome)
+    threads: resources["GATK"]["HaplotypeCaller"]['threads']  # Number of threads
     resources:
-        # Number of threads to use, defined in the resources dictionary
-        mem_mb = resources["GATK"]["HaplotypeCaller"]['mem']
+        mem_mb = resources["GATK"]["HaplotypeCaller"]['mem']  # Memory allocation
     wrapper:
-        # Wrapper for GATK HaplotypeCaller
-        "v3.10.2/bio/gatk/haplotypecaller"
+        "v3.10.2/bio/gatk/haplotypecaller"  # Wrapper
 
+# Rule for running GATK CombineGVCFs
 rule combine_gvcfs:
     input:
-        # List of GVCF files for a given sample
-        gvcfs = get_gvcfs_by_sample,
-        # Reference genome file
-        ref = rules.copy_reference.output
+        gvcfs = get_gvcfs_by_sample,  # List of GVCF files
+        ref = rules.copy_reference.output  # Reference genome
     output:
-        # Output combined GVCF file for the specified sample
-        gvcf ="results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz"
+        gvcf = "results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz"  # Combined GVCF output
     log:
-        # Log file for CombineGVCFs process
-        'results/{plate}/variant_calling/GATK/{ref}/log/CombineGVCFs/{sample}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/CombineGVCFs/{sample}.log'  # Log file
     params:
-        # Extra parameters for GATK CombineGVCFs
-        extra = get_GATK_CombineGVCFs_params()
+        extra = get_GATK_CombineGVCFs_params()  # Extra parameters
     resources:
-        # Memory allocation for CombineGVCFs
-        mem_mb = resources['GATK']['CombineGVCFs']['mem']
+        mem_mb = resources['GATK']['CombineGVCFs']['mem']  # Memory allocation
     wrapper:
-        # Wrapper for GATK CombineGVCFs
-        "v3.10.2/bio/gatk/combinegvcfs"
+        "v3.10.2/bio/gatk/combinegvcfs"  # Wrapper
 
+# Rule for running GATK GenomicsDBImport
 rule genomics_db_import:
     input:
-        # List of GVCF files for the genomic database import
-        gvcfs = get_gvcfs_DB
+        gvcfs = get_gvcfs_DB  # List of GVCF files
     output:
-        # Directory for the genomic database
-        db = directory("results/{plate}/variant_calling/GATK/{ref}/DB/{chrom}")
+        db = directory("results/{plate}/variant_calling/GATK/{ref}/DB/{chrom}")  # Genomic database output
     log:
-        # Log file for GenomicsDBImport process
-        'results/{plate}/variant_calling/GATK/{ref}/log/GenomicsDBImport/{chrom}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/GenomicsDBImport/{chrom}.log'  # Log file
     params:
-        # Extra parameters for GATK GenomicsDBImport
-        extra = get_GenomicsDBImport_params(),
-        # Interval for GenomicsDBImport, typically a chromosome
-        intervals = lambda wildcards: "{interval}".format(interval = wildcards.chrom)
-    threads: 4
+        extra = get_GenomicsDBImport_params(),  # Extra parameters
+        intervals = lambda wildcards: "{interval}".format(interval=wildcards.chrom)  # Intervals per chromosome
+    threads: 4  # Number of threads
     resources:
-        # Memory allocation for GenomicsDBImport
-        mem_mb = 34000
+        mem_mb = 34000  # Memory allocation
     wrapper:
-        # Wrapper for GATK GenomicsDBImport
-        "v3.10.2/bio/gatk/genomicsdbimport"
+        "v3.10.2/bio/gatk/genomicsdbimport"  # Wrapper
 
+# Rule for running GATK GenotypeGVCFs
 rule genotype_gvcfs:
     input:
-        # Genomic database directory from GenomicsDBImport
-        genomicsdb = rules.genomics_db_import.output.db,
-        # Reference genome file
-        ref = rules.copy_reference.output
+        genomicsdb = rules.genomics_db_import.output.db,  # Genomic database
+        ref = rules.copy_reference.output  # Reference genome
     output:
-        # Output VCF file with genotyped variants for the specified intervals
-        vcf = "results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz"
+        vcf = "results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz"  # Genotyped VCF output
     log:
-        # Log file for GenotypeGVCFs process
-        'results/{plate}/variant_calling/GATK/{ref}/log/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.log'  # Log file
     params:
-        # Extra parameters for GATK GenotypeGVCFs
-        extra = get_GenotypeGVCFs_params(),
-        # Interval for GenotypeGVCFs, specified as chromosome and range
+        extra = get_GenotypeGVCFs_params(),  # Extra parameters
         intervals = lambda wildcards: "{chrom}:{interval_i}-{interval_e}".format(
-            chrom = wildcards.chrom, 
-            interval_i = wildcards.interval_i, 
-            interval_e = wildcards.interval_e
-        )
+            chrom=wildcards.chrom,
+            interval_i=wildcards.interval_i,
+            interval_e=wildcards.interval_e
+        )  # Intervals (chromosome and range)
     resources:
-        # Memory allocation for GenotypeGVCFs
-        mem_mb = 1024
+        mem_mb = 1024  # Memory allocation
     wrapper:
-        # Wrapper for GATK GenotypeGVCFs
-        "v3.10.2/bio/gatk/genotypegvcfs"
+        "v3.10.2/bio/gatk/genotypegvcfs"  # Wrapper
 
+# Rule for concatenating VCF files using bcftools
 rule bcftools_concat:
     input:
-        # A function or list of VCF files to be concatenated
-        calls = get_interval_raw_vcfs,
-        # The reference index file
-        fai = rules.genome_faidx.output 
+        calls = get_interval_raw_vcfs,  # List of VCF files
+        fai = rules.genome_faidx.output  # Reference index file
     output:
-        # The output concatenated VCF file
-        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz"
+        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz"  # Concatenated VCF output
     log:
-        # Log file for the concatenation process
-        'results/{plate}/variant_calling/GATK/{ref}/log/bcftools_merge/{plate}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/bcftools_merge/{plate}.log'  # Log file
     params:
-        # Parameter to control if the output should be uncompressed BCF format
-        uncompressed_bcf = False,
-        # Optional parameters for bcftools concat (excluding -o, which is handled by Snakemake)
-        extra = "-Oz"
-    threads: 30
+        uncompressed_bcf = False,  # Output format
+        extra = "-Oz"  # Extra parameters
+    threads: 30  # Number of threads
     resources:
-        # Memory allocation for the rule
-        mem_mb = 10240
+        mem_mb = 10240  # Memory allocation
     wrapper:
-        # The wrapper for bcftools concat
-        "v3.14.0/bio/bcftools/concat"
+        "v3.14.0/bio/bcftools/concat"  # Wrapper
 
+# Rule for selecting variants using GATK SelectVariants
 rule select_variants:
     input:
-        # Input raw VCF file from bcftools concat
-        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz",
-        # Reference genome file
-        ref = rules.copy_reference.output
+        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz",  # Input VCF
+        ref = rules.copy_reference.output  # Reference genome
     output:
-        # Output VCF file with selected biallelic variants
-        biallelic_snp_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.snp.vcf.gz"
+        biallelic_snp_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.snp.vcf.gz"  # Output VCF
     log:
-        # Log file for the SelectVariants process
-        'results/{plate}/variant_calling/GATK/{ref}/log/SelectVariants/{plate}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/SelectVariants/{plate}.log'  # Log file
     params:
-        # Optional extra parameters for GATK SelectVariants
-        extra = get_SelectVariants_params()
+        extra = get_SelectVariants_params()  # Extra parameters
     resources:
-        # Memory allocation for the rule
-        mem_mb = 10240
+        mem_mb = 10240  # Memory allocation
     wrapper:
-        # The wrapper for GATK SelectVariants
-        "v3.14.0/bio/gatk/selectvariants"
+        "v3.14.0/bio/gatk/selectvariants"  # Wrapper
 
+# Rule for filtering variants using GATK VariantFiltration
 rule variant_filtering:
     input:
-        # Input VCF file from SelectVariants
-        biallelic_snp_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.snp.vcf.gz",
-        # Reference genome file
-        ref = rules.copy_reference.output
+        biallelic_snp_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.biallelic.snp.vcf.gz",  # Input VCF
+        ref = rules.copy_reference.output  # Reference genome
     output:
-        # Output hard-filtered VCF file
-        hardfiltered_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.hardfiltered.snp.vcf.gz"
+        hardfiltered_vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.hardfiltered.snp.vcf.gz"  # Filtered VCF output
     log:
-        # Log file for the VariantFiltration process
-        'results/{plate}/variant_calling/GATK/{ref}/log/VariantFiltration/{plate}.log'
+        'results/{plate}/variant_calling/GATK/{ref}/log/VariantFiltration/{plate}.log'  # Log file
     params:
-        # Filters for VariantFiltration (could be expanded for clarity or flexibility)
-        filters = {"myfilter": "QD = 2.0 || MQ = 40.0 || FS = 60.0 || SOR = 3.0 || MQR = -12.5 || RPR = -8.0"}
+        filters = {"myfilter": "QD < 2.0 || MQ < 40.0 || FS > 60.0 || SOR > 3.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0"}  # Filters
     resources:
-        # Memory allocation for the rule
-        mem_mb = 10240
+        mem_mb = 10240  # Memory allocation
     wrapper:
-        # The wrapper for GATK VariantFiltration
-        "v3.14.0/bio/gatk/variantfiltration"
+        "v3.14.0/bio/gatk/variantfiltration"  # Wrapper

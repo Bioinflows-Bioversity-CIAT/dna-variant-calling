@@ -1,14 +1,17 @@
+# Paths to various input files and configuration settings
 sequencing_units: config/sequencing_units.tsv
 sample_units: config/samples.tsv
 references: config/references.tsv
-
 resources_config: config/resources.yaml
 
+# Settings for the demultiplexing process
 demultiplexing:
   re_enzyme: "apeKI"
 
+# Directory for temporary files
 bigtmp: tmpdir/
 
+# Trimmomatic settings for paired-end reads
 trimmomatic:
     pe:
       trimmer:
@@ -18,8 +21,9 @@ trimmomatic:
         - "MINLEN:36"
         - "ILLUMINACLIP:data/adapter.fa:2:20:7:2"
 
+# NGSEP software and variant calling settings
 NGSEP:
-    path: /home/scruz/software//NGSEPcore/NGSEPcore_5.0.0.jar
+    path: /home/scruz/software/NGSEPcore/NGSEPcore_5.0.0.jar
     SingleSampleVariantsDetector:
         h: 0.0001
         maxBaseQS: 30
@@ -30,11 +34,12 @@ NGSEP:
     VCFFilter:
         QC_thresold: 40
 
+# GATK variant calling settings
 GATK:
   interval_length: 1000000
   HaplotypeCaller:
     G: ["StandardAnnotation", "StandardHCAnnotation"]
-    kmer-size: [11,17,23,29,35,41]
+    kmer-size: [11, 17, 23, 29, 35, 41]
     min_base-qual: 28
     extra:
       - "--do-not-run-physical-phasing"

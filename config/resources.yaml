@@ -1,17 +1,18 @@
+# Resource allocations for various processes
 stacks:
   process_radtags:
     threads: 50
 
 trimmomatic:
   threads: 5
-  mem: 4096
+  mem: 4096  # Memory in MB
 
 bwa_mem:
-    threads: 10
+  threads: 10
 
 GATK:
   HaplotypeCaller:
     threads: 4
-    mem: 7000
+    mem: 7000  # Memory in MB
   CombineGVCFs:
-    mem: 10240
+    mem: 10240  # Memory in MB
