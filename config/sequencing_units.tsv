@@ -1,6 +1,2 @@
 flowcell_id	lane	index	sequencing_unit_id	plate	fq1	fq2
-HKY23DSX3	2		HKY23DSX3-2-46	46	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/ongoing_gbs/CGNGSLL221007/Sample_R23400052-GBS-46-GBS-46/R23400052-GBS-46-GBS-46_combined_R1.fastq.gz	
-HTK35DSX3	4		HTK35DSX3-4-47	47	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/ongoing_gbs/CGNGSLL221007/Sample_R23400053-GBS-47-GBS-47/R23400053-GBS-47-GBS-47_combined_R1.fastq.gz	
-HTK35DSX3	2		HTK35DSX3-2-48	48	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/ongoing_gbs/CGNGSLL221007/Sample_R23400054-GBS-48-GBS-48/R23400054-GBS-48-GBS-48_combined_R1.fastq.gz	
-HTK35DSX3	3		HTK35DSX3-3-49	49	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/ongoing_gbs/CGNGSLL221007/Sample_R23400055-GBS-49-GBS-49/R23400055-GBS-49-GBS-49_combined_R1.fastq.gz	
-HTK35DSX3	3		HTK35DSX3-3-50	50	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/ongoing_gbs/CGNGSLL221007/Sample_R23400056-GBS-50-GBS-50/R23400056-GBS-50-GBS-50_combined_R1.fastq.gz	
+HF7JFCCX2	8		HF7JFCCX2-8-44	44	data/GCDT_20-01_44_1.fastq.gz	data/GCDT_20-01_44_2.fastq.gz

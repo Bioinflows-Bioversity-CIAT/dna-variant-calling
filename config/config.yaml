@@ -1,5 +1,13 @@
+demultiplex: True
+
+# DEMULTIPLEXING TRUE
 sequencing_units: config/sequencing_units.tsv
 sample_units: config/samples.tsv
+
+# DEMULTIPLEXING FALSE
+sample_units_no_demultiplex: config/samples_no.tsv
+
+
 references: config/references.tsv
 barcodes: /home/scruz/workflows/dna-variant-calling/resources/GBS_wells_adapters.csv
 resources_config: config/resources.yaml

@@ -7,7 +7,8 @@ import random
 import string
 
 min_version("5.18.0")
-basedir = "/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/VXS"
+basedir = "/home/scruz/test"
+
 # Config params
 configfile: "config/config.yaml"
 
@@ -17,16 +18,23 @@ with open(config["resources_config"], "r") as f:
     resources = safe_load(f)
 
 
-sequencing_units = pd.read_table(config["sequencing_units"], sep="\t")
-validate(sequencing_units, schema="../schemas/units.schema.yaml")
 
-sequencing_units['plate'] = sequencing_units.plate.astype(str)
+# Depending if demultiplexing is required
+if config['demultiplexing']:
+    sequencing_units = pd.read_table(config["sequencing_units"], sep="\t")
+    validate(sequencing_units, schema="../schemas/units.schema.yaml")
 
-sample_units = pd.read_table(config["sample_units"], sep="\t")
-validate(sample_units, schema="../schemas/samples.schema.yaml")
-sample_units['plate'] = sample_units.plate.astype(str)
+    sequencing_units['plate'] = sequencing_units.plate.astype(str)
 
-sample_units = sample_units.merge(sequencing_units[['sequencing_unit_id', 'plate', 'fq1', 'fq2']], on="plate")
+    sample_units = pd.read_table(config["sample_units"], sep="\t")
+    validate(sample_units, schema="../schemas/samples.schema.yaml")
+    sample_units['plate'] = sample_units.plate.astype(str)
+
+    sample_units = sample_units.merge(sequencing_units[['sequencing_unit_id', 'plate', 'fq1', 'fq2']], on="plate")
+    print(sample_units)
+    print(sequencing_units)
+else:
+    sample_units = pd.read_table(config["sequencing_units"], sep="\t")
 
 
 references = pd.read_table(config['references'], sep = '\t')
