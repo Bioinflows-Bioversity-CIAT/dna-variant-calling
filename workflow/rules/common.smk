@@ -16,6 +16,8 @@ configfile: "config/config.yaml"
 with open(config["resources_config"], "r") as f:
     resources = safe_load(f)
 
+# Set base_dir
+base_dir = config['base_dir']
 
 sequencing_units = pd.read_table(config["sequencing_units"], sep="\t")
 validate(sequencing_units, schema="../schemas/units.schema.yaml")

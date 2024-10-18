@@ -2,38 +2,42 @@ rule copy_reference:
     input:
         fasta = get_reference_fasta
     output:
-        "resources/{ref}/{ref}.fasta"
+        f"{base_dir}/resources/{{ref}}/{{ref}}.fasta"
     shell:
         """
         cp {input.fasta} {output}
         """
 
-checkpoint genome_faidx:
+rule genome_faidx:
     input:
         path = rules.copy_reference.output
     output:
-        "resources/{ref}/{ref}.fasta.fai"
+        f"{base_dir}/resources/{{ref}}/{{ref}}.fasta.fai"
     cache: True
-    wrapper:
-        "v3.10.2/bio/samtools/faidx"
+    conda:
+        "../envs/ngs.yaml"
+    shell:
+        """
+        samtools faidx {input.path}
+        """
 
 rule bwa_index:
     input:
-        "resources/{ref}/{ref}.fasta",
+        rules.copy_reference.output
     output:
          idx=multiext("resources/{ref}.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
     log:
-        "logs/{ref}_bwa_index.log"
+        f"{base_dir}/logs/{{ref}}_bwa_index.log"
     params:
-        algorithm="bwtsw",
+        algorithm="is",
     wrapper:
-        "v3.10.2/bio/bwa/index"
+        "v4.7.2/bio/bwa/index"
 
-checkpoint get_intervals:
+rule get_intervals:
     input:
-        fai = "resources/{ref}/{ref}.fasta.fai"
+        fai = rule.genome_faidx.output
     output:
-        intervals = "resources/{ref}/{ref}_intervals.txt"
+        intervals = f"{base_dir}/resources/{{ref}}/{{ref}}_intervals.txt"
     params:
         l = config['GATK']['interval_length'] # NOT USED
     run:
@@ -45,13 +49,12 @@ checkpoint get_intervals:
                     print(chrom, file=out)
 rule create_dict:
     input:
-        "resources/{ref}/{ref}.fasta"
+        rules.copy_reference.output
     output:
-        "resources/{ref}/{ref}.dict"
+        f"{base_dir}/resources/{{ref}}/{{ref}}.dict"
     log:
-        "resources/{ref}/{ref}_dict.log",
-    params:
+        f"{base_dir}/resources/{{ref}}/{{ref}}_dict.log",
     resources:
         mem_mb=1024,
     wrapper:
-        "v3.10.2/bio/picard/createsequencedictionary"
+        "v4.7.2/bio/picard/createsequencedictionary"

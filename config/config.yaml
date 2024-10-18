@@ -1,3 +1,6 @@
+base_dir: ""
+
+
 sequencing_units: config/sequencing_units.tsv
 sample_units: config/samples.tsv
 references: config/references.tsv
