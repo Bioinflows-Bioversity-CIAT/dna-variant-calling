@@ -27,9 +27,8 @@ sequencing_units['plate'] = sequencing_units.plate.astype(str)
 sample_units = pd.read_table(config["sample_units"], sep="\t")
 validate(sample_units, schema="../schemas/samples.schema.yaml")
 sample_units['plate'] = sample_units.plate.astype(str)
-
-sample_units = sample_units.merge(sequencing_units[['sequencing_unit_id', 'plate', 'fq1', 'fq2']], on="plate")
-
+sample_units = sample_units.merge(sequencing_units[['sequencing_unit_id', 'plate']], on="plate")
+sample_units.set_index("line_id", inplace = True)
 
 references = pd.read_table(config['references'], sep = '\t')
 validate(references, schema="../schemas/references.schema.yaml")
@@ -61,15 +60,23 @@ def get_demultiplex_params(wildcards):
         return "-f {R1}".format(R1=fastqs.fq1)
     
 def get_sample_fastq(wildcards):
-    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
-    fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
-    
-    if not pd.isna(fastqs.fq2):
-        sample_fastq = glob.glob(checkpoint_output + "/{sample}.[1,2].fq.gz".format(sample = wildcards.sample))
-        return {"r1": sample_fastq[0], "r2": sample_fastq[1]}
+    if config['demultiplexing']['perform']:
+        checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+        fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
+        if not pd.isna(fastqs.fq2):
+            sample_fastq = glob.glob(checkpoint_output + "/{sample}.[1,2].fq.gz".format(sample = wildcards.sample))
+            return {"r1": sample_fastq[0], "r2": sample_fastq[1]}
+        else:
+            sample_fastq = glob.glob(checkpoint_output + "/{sample}.fq.gz".format(sample = wildcards.sample))
+            return sample_fastq
     else:
-        sample_fastq = glob.glob(checkpoint_output + "/{sample}.fq.gz".format(sample = wildcards.sample))
-        return sample_fastq
+        sample_data = sample_units.loc[wildcards.sample]
+        if not pd.isna(sample_data.fq2):
+            return {"r1": sample_data.fq1, "r2": sample_data.fq2}
+        else:
+            return sample_data.fq1
+
+
 
 def get_trimmed_reads(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]

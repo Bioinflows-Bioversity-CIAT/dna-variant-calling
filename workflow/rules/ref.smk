@@ -27,7 +27,7 @@ rule bwa_index:
     output:
          idx=multiext("resources/{ref}.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
     log:
-        f"{base_dir}/logs/{{ref}}_bwa_index.log"
+        f"{base_dir}/log/reference/{{ref}}_bwa_index.log"
     params:
         algorithm="is",
     wrapper:
@@ -53,7 +53,7 @@ rule create_dict:
     output:
         f"{base_dir}/resources/{{ref}}/{{ref}}.dict"
     log:
-        f"{base_dir}/resources/{{ref}}/{{ref}}_dict.log",
+        f"{base_dir}/log/reference/{{ref}}_dict.log",
     resources:
         mem_mb=1024,
     wrapper:
