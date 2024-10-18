@@ -116,26 +116,34 @@ def get_reference_fasta(wildcards):
 
 
 def get_sample_vcfs_by_plate_merge_variants(wildcards):
-    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
-    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
-    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    if config['demultiplexing']['perform']:
+        checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+        sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+        sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    else:
+        plate_samples = sample_units[sample_units['plate'] == wildcards.plate]
+        sample_names = sample_names['line_id'].tolist()
 
-    vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
-        plate = wildcards.plate,
-        ref = wildcards.ref,
-        sample = sample_names )
-    return vcfs
+    vcfs = expand("{base_dir}/results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
+            base_dir = base_dir,
+            plate = wildcards.plate,
+            ref = wildcards.ref,
+            sample = sample_names )
+        return vcfs
 
 def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
-    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
-    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
-    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    if config['demultiplexing']['perform']:
+        checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+        sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+        sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    else:
+        plate_samples = sample_units[sample_units['plate'] == wildcards.plate]
+        sample_names = sample_names['line_id'].tolist()
 
-    vcfs = expand("results/{plate}/variant_calling/NGSEP/{ref}/second_variant_call_plate/{sample}_bwa_NGSEP.vcf.gz",
+    vcfs = expand(f"{base_dir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/second_variant_call_plate/{{sample}}_bwa_NGSEP.vcf.gz",
         plate = wildcards.plate,
         ref = wildcards.ref,
         sample = sample_names )
-    return vcfs
 
 def get_GATK_HaplotypeCaller_params():
     # Annotation params
