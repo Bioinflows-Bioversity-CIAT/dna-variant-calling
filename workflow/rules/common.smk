@@ -82,13 +82,15 @@ def get_trimmed_reads(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
     if not pd.isna(fastqs.fq2):
         return expand(
-            "results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
+            "{base_dir}results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
+            base_dir = base_dir,
             group = [1,2],
             **wildcards
         )
     else:
         return expand(
-            "results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
+            "{base_dir}/results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
+            base_dir = base_dir,
             **wildcards
         )
 
