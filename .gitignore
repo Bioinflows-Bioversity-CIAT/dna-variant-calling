@@ -5,3 +5,11 @@ resources*
 data/
 logs*
 nohup.out
+*.vcf.gz
+*.hmp
+*.bed
+*.ped
+*.map
+*.gen
+*.tbi
+log/
