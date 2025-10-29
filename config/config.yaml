@@ -1,4 +1,4 @@
-base_dir: ""
+basedir: "/home/scruz/evros_project"
 
 
 sequencing_units: config/sequencing_units.tsv
@@ -8,6 +8,7 @@ references: config/references.tsv
 resources_config: config/resources.yaml
 
 demultiplexing:
+  perform: False
   re_enzyme: "apeKI"
 
 bigtmp: tmpdir/

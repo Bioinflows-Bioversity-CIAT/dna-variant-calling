@@ -16,8 +16,8 @@ configfile: "config/config.yaml"
 with open(config["resources_config"], "r") as f:
     resources = safe_load(f)
 
-# Set base_dir
-base_dir = config['base_dir']
+# Set basedir
+basedir = config['basedir']
 
 sequencing_units = pd.read_table(config["sequencing_units"], sep="\t")
 validate(sequencing_units, schema="../schemas/units.schema.yaml")
@@ -27,8 +27,9 @@ sequencing_units['plate'] = sequencing_units.plate.astype(str)
 sample_units = pd.read_table(config["sample_units"], sep="\t")
 validate(sample_units, schema="../schemas/samples.schema.yaml")
 sample_units['plate'] = sample_units.plate.astype(str)
-sample_units = sample_units.merge(sequencing_units[['sequencing_unit_id', 'plate']], on="plate")
-sample_units.set_index("line_id", inplace = True)
+sample_units = sample_units.merge(sequencing_units, on="plate")
+sample_units.set_index("line_id", inplace = True, drop = False)
+
 
 references = pd.read_table(config['references'], sep = '\t')
 validate(references, schema="../schemas/references.schema.yaml")
@@ -36,7 +37,7 @@ references.set_index("ref_name", inplace = True)
 
 
 sequencing_units.set_index("plate", inplace = True)
-
+print(sample_units)
 print(config)
 
 # UTIL functions
@@ -58,7 +59,7 @@ def get_demultiplex_params(wildcards):
         return "-1 {R1} -2 {R2}".format(R1=fastqs.fq1, R2=fastqs.fq2)
     else:
         return "-f {R1}".format(R1=fastqs.fq1)
-    
+
 def get_sample_fastq(wildcards):
     if config['demultiplexing']['perform']:
         checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
@@ -82,23 +83,24 @@ def get_trimmed_reads(wildcards):
     fastqs = sequencing_units.loc[wildcards.plate, ['fq1','fq2']]
     if not pd.isna(fastqs.fq2):
         return expand(
-            "{base_dir}results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
-            base_dir = base_dir,
+            "{basedir}/results/{plate}/trimming/trimmomatic/paired/{sample}.{group}.fastq.gz",
+            basedir = basedir,
             group = [1,2],
             **wildcards
         )
     else:
         return expand(
-            "{base_dir}/results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
-            base_dir = base_dir,
+            "{basedir}/results/{plate}/trimming/trimmomatic/single/{sample}.fastq.gz",
+            basedir = basedir,
             **wildcards
         )
 
 def get_read_group(wildcards):
     """Denote sample name and platform in read group."""
-    return r"-R '@RG\tID:{sample}\tSM:{sample}\tPL:{platform}'".format(
+
+    return r"-R '@RG\tID:{sample}\tSM:{sample}'".format(
         sample=wildcards.sample,
-        platform="ILLUMINA",
+        platform="ILLUMINA"
     )
 
 def get_big_temp(wildcards):
@@ -124,12 +126,12 @@ def get_sample_vcfs_by_plate_merge_variants(wildcards):
         plate_samples = sample_units[sample_units['plate'] == wildcards.plate]
         sample_names = sample_names['line_id'].tolist()
 
-    vcfs = expand("{base_dir}/results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
-            base_dir = base_dir,
+    vcfs = expand("{basedir}/results/{plate}/variant_calling/NGSEP/{ref}/first_variant_calling/{sample}_bwa_NGSEP.vcf.gz",
+            basedir = basedir,
             plate = wildcards.plate,
             ref = wildcards.ref,
             sample = sample_names )
-        return vcfs
+    return vcfs
 
 def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
     if config['demultiplexing']['perform']:
@@ -140,7 +142,7 @@ def get_sample_vcfs_by_plate_merge_vcfs(wildcards):
         plate_samples = sample_units[sample_units['plate'] == wildcards.plate]
         sample_names = sample_names['line_id'].tolist()
 
-    vcfs = expand(f"{base_dir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/second_variant_call_plate/{{sample}}_bwa_NGSEP.vcf.gz",
+    vcfs = expand(f"{basedir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/second_variant_call_plate/{{sample}}_bwa_NGSEP.vcf.gz",
         plate = wildcards.plate,
         ref = wildcards.ref,
         sample = sample_names )
@@ -160,20 +162,29 @@ def get_GATK_CombineGVCFs_params():
     return annot
 
 def get_gvcfs_DB(wildcards):
-    checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
-    sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
-    sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    if config['demultiplexing']['perform']:
+        checkpoint_output = checkpoints.demultiplex.get(**wildcards).output.outdir
+        sample_list = glob.glob(checkpoint_output + "/*[!rem]*.fq.gz")
+        sample_names = list(set([s.split('/')[-1].split('.')[0] for s in sample_list]))
+    else:
+        #plate_samples = sample_units[sample_units['plate'] == wildcards.plate]
+        sample_names = sample_units['line_id'].tolist()
 
     gvcfs_list = list()
-    for isample in sample_names:
-        gvcf = 'results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz'.format(
+    for isample, row in sample_units.iterrows():
+        gvcf = '{basedir}/results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz'.format(
+            basedir = basedir,
+            plate = row.plate,
             sample = isample,**wildcards)
         gvcfs_list.append(gvcf)
+
     return gvcfs_list
 
 def get_gvcfs_by_sample(wildcards):
-    intervals = pd.read_csv("resources/{ref}/{ref}_intervals.txt".format(**wildcards), header = None)
-    gvcfs = ['results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{interval}/{sample}_{interval}.g.vcf.gz'.format(
+    intervals_path = checkpoints.get_intervals.get(**wildcards).output.intervals
+    intervals = pd.read_csv(intervals_path, header = None)
+    gvcfs = ['{basedir}/results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{interval}/{sample}_{interval}.g.vcf.gz'.format(
+        basedir = basedir,
         interval = i[0],
         **wildcards) for n,i in intervals.iterrows()]
     return gvcfs
@@ -224,7 +235,8 @@ def get_interval_raw_vcfs(wildcards):
     
     # Read genome fai to infer the intervals
     #fai = "resources/{ref}/{ref}.fasta.fai".format(**wildcards)
-    fai = "resources/{ref}/{ref}.fasta.fai".format(**wildcards)
+    #fai = f"{basedir}/resources/{ref}/{ref}.fasta.fai".format(basedir = basedir,**wildcards)
+    fai = str(checkpoints.genome_faidx.get(**wildcards).output)
     # Open the file in read mode
     with open(fai, 'r') as file:
         # Read all lines from the file
@@ -240,11 +252,12 @@ def get_interval_raw_vcfs(wildcards):
         
         intervals = create_intervals(1,length, int(config['GATK']['GenotypeGVCFs']['interval_length']))
 
-        vcfs = ["results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz".format(
+        vcfs = ["{basedir}/results/DB/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz".format(
+            basedir = basedir,
             chrom = chrom,
             interval_i = str(i[0]),
             interval_e = str(i[1]),
-            **wildcards
+            ref = wildcards.ref
         ) for i in intervals]
 
         intervals_list.extend(vcfs)
@@ -257,5 +270,6 @@ wildcard_constraints:
     plate="|".join(sample_units['plate'].unique()),
     sample="|".join(sample_units['line_id'].unique()),
     ref = "|".join(references.index),
+    chrom = "Chr[0-9]+|scaffold_[0-9]+",
     interval_i = "\d+",
     interval_e = "\d+",

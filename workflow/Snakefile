@@ -1,11 +1,40 @@
 include: "rules/common.smk"
 
+def get_sample_vcf():
+    ref_id = 'UI111'
+    urls = list()
+    for sample_id, sample in sample_units.iterrows():
+        print
+        path = f"{basedir}/results/{sample.plate}/variant_calling/GATK/{ref_id}/CombineGVCFs/{sample_id}.g.vcf.gz"
+        urls.append(path)
+    return(urls)
+
+def get_sample_bam():
+    ref_id = 'UI111'
+    urls = list()
+    for sample_id, sample in sample_units.iterrows():
+        print
+        path = f"{basedir}/results/{sample.plate}/mapping/bwa/{ref_id}/{sample_id}.sorted.bam"
+        urls.append(path)
+    return(urls)
+
+
+def get_dbs():
+    intervals = '/opt/bean_fast/5.Others/Luis_introgression/resources/UI111/UI111_intervals.txt'
+    paths = list()
+    # Open and read the file line by line
+    with open(intervals, 'r') as file:
+        for line in file:
+            # Remove trailing newline characters
+            chrom = line.strip()
+            path = f"{basedir}/results/DB/variant_calling/GATK/UI111/{chrom}"
+            paths.append(path)
+    return(paths)
+
 rule all:
     input:
-        vcf = "results/44/mapping/v21/NGSEP/vcf/44_merged.vcf.gz",
-        DB = expand("results/44/mapping/v21/GATK/DB/{chrom}/DB_{chrom}", chrom = ['Chr01','Chr02','Chr03','Chr04','Chr05','Chr06','Chr07','Chr08','Chr09','Chr10','Chr11'])
-
-# Modules
+        vcf = f"{basedir}/results/DB/variant_calling/GATK/Pv21/merged/merged.raw.vcf.gz"
+        
 include: "rules/ref.smk"
 include: "rules/demultiplexing.smk"
 include: "rules/read_trimming.smk"

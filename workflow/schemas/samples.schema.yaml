@@ -3,7 +3,7 @@ description: row of the samples.tsv, representing a individual sample
 type: object
 properties:
   plate:
-    type: integer
+    type: string
     description: Plate identification name
   line_id:
     type: string

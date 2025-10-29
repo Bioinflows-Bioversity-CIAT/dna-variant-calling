@@ -2,42 +2,39 @@ rule copy_reference:
     input:
         fasta = get_reference_fasta
     output:
-        f"{base_dir}/resources/{{ref}}/{{ref}}.fasta"
+        f"{basedir}/resources/{{ref}}/{{ref}}.fasta"
     shell:
         """
         cp {input.fasta} {output}
         """
 
-rule genome_faidx:
+checkpoint genome_faidx:
     input:
         path = rules.copy_reference.output
     output:
-        f"{base_dir}/resources/{{ref}}/{{ref}}.fasta.fai"
+        f"{basedir}/resources/{{ref}}/{{ref}}.fasta.fai"
     cache: True
-    conda:
-        "../envs/ngs.yaml"
-    shell:
-        """
-        samtools faidx {input.path}
-        """
+    wrapper:
+        "v4.7.2/bio/samtools/faidx"
+    
 
 rule bwa_index:
     input:
         rules.copy_reference.output
     output:
-         idx=multiext("resources/{ref}.fasta", ".amb", ".ann", ".bwt", ".pac", ".sa")
+         multiext(f"{basedir}/resources/{{ref}}/{{ref}}.fasta", ".0123", ".amb", ".ann", ".bwt.2bit.64", ".pac")
     log:
-        f"{base_dir}/log/reference/{{ref}}_bwa_index.log"
+        f"{basedir}/log/reference/{{ref}}_bwa_index.log"
     params:
         algorithm="is",
     wrapper:
-        "v4.7.2/bio/bwa/index"
+        "v5.9.0/bio/bwa-mem2/index"
 
-rule get_intervals:
+checkpoint get_intervals:
     input:
-        fai = rule.genome_faidx.output
+        fai =  f"{basedir}/resources/{{ref}}/{{ref}}.fasta.fai"
     output:
-        intervals = f"{base_dir}/resources/{{ref}}/{{ref}}_intervals.txt"
+        intervals = f"{basedir}/resources/{{ref}}/{{ref}}_intervals.txt"
     params:
         l = config['GATK']['interval_length'] # NOT USED
     run:
@@ -51,9 +48,9 @@ rule create_dict:
     input:
         rules.copy_reference.output
     output:
-        f"{base_dir}/resources/{{ref}}/{{ref}}.dict"
+        f"{basedir}/resources/{{ref}}/{{ref}}.dict"
     log:
-        f"{base_dir}/log/reference/{{ref}}_dict.log",
+        f"{basedir}/log/reference/{{ref}}_dict.log",
     resources:
         mem_mb=1024,
     wrapper:

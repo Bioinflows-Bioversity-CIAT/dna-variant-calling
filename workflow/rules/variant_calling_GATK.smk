@@ -6,9 +6,9 @@ rule haplotype_caller_gvcf:
         ref = rules.copy_reference.output,
         genome_dict = rules.create_dict.output
     output:
-        gvcf='results/{plate}/variant_calling/GATK/{ref}/HaplotyeCaller/intervals/{chrom}/{sample}_{chrom}.g.vcf.gz'
+        gvcf=f'{basedir}/results/{{plate}}/variant_calling/GATK/{{ref}}/HaplotyeCaller/intervals/{{chrom}}/{{sample}}_{{chrom}}.g.vcf.gz'
     log:
-        'results/{plate}/variant_calling/GATK/{ref}/log/HaplotyeCaller/{chrom}/{sample}_{chrom}.log'
+        f"{basedir}/log/variant_calling/GATK/HaplotyeCaller/{{plate}}/{{ref}}/{{chrom}}/{{sample}}_{{chrom}}.log"
     params:
         extra=get_GATK_HaplotypeCaller_params(),
         intervals = lambda wildcards: f"{wildcards.chrom}"
@@ -17,39 +17,39 @@ rule haplotype_caller_gvcf:
     resources:
         mem_mb=resources["GATK"]["HaplotypeCaller"]['mem'],
     wrapper:
-        "v3.10.2/bio/gatk/haplotypecaller"
+        "v4.7.2/bio/gatk/haplotypecaller"
 
 rule combine_by_sample_gvcfs:
     input:
         gvcfs = get_gvcfs_by_sample,
         ref = rules.copy_reference.output,
     output:
-        gvcf ="results/{plate}/variant_calling/GATK/{ref}/CombineGVCFs/{sample}.g.vcf.gz",
+        gvcf =f"{basedir}/results/{{plate}}/variant_calling/GATK/{{ref}}/CombineGVCFs/{{sample}}.g.vcf.gz",
     log:
-        'results/{plate}/variant_calling/GATK/{ref}/log/CombineGVCFs/{sample}.log'
+        f"{basedir}/log/variant_calling/GATK/CombineGVCFs/{{plate}}/{{ref}}/{{sample}}.log"
     params:
         extra = get_GATK_CombineGVCFs_params(),  
     resources:
         mem_mb=resources['GATK']['CombineGVCFs']['mem'],
     wrapper:
-        "v3.10.2/bio/gatk/combinegvcfs"
+        "v4.7.2/bio/gatk/combinegvcfs"
 
 
 rule genomics_db_import:
     input:
         gvcfs=get_gvcfs_DB,
     output:
-        db=directory("results/{plate}/variant_calling/GATK/{ref}/DB/{chrom}"),
+        db=directory(f"{basedir}/results/DB/variant_calling/GATK/{{ref}}/{{chrom}}"),
     log:
-        'results/{plate}/variant_calling/GATK/{ref}/log/GenomicsDBImport/{chrom}.log'
+            f'{basedir}/results/DB/variant_calling/GATK/{{ref}}/log/GenomicsDBImport/{{chrom}}.log'
     params:
         extra= get_GenomicsDBImport_params(),  # optional
         intervals = lambda wildcards: "{interval}".format(interval = wildcards.chrom)
-    threads: 4
+    threads: 10
     resources:
         mem_mb=34000,
     wrapper:
-        "v3.10.2/bio/gatk/genomicsdbimport"
+        "v4.7.2/bio/gatk/genomicsdbimport"
 
 
 rule genotype_gvcfs:
@@ -57,28 +57,28 @@ rule genotype_gvcfs:
         genomicsdb = rules.genomics_db_import.output.db,
         ref=rules.copy_reference.output,
     output:
-        vcf = "results/{plate}/variant_calling/GATK/{ref}/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.vcf.gz"
+        vcf = f"{basedir}/results/DB/variant_calling/GATK/{{ref}}/GenotypeGVCFs/{{chrom}}/{{interval_i}}-{{interval_e}}.vcf.gz"
     log:
-        'results/{plate}/variant_calling/GATK/{ref}/log/GenotypeGVCFs/{chrom}/{interval_i}-{interval_e}.log'
+        f"{basedir}/log/variant_calling/GATK/GenotypeGVCFs/{{ref}}/{{chrom}}/{{interval_i}}-{{interval_e}}.log"
     params:
         extra=get_GenotypeGVCFs_params(),
         intervals = lambda wildcards: "{chrom}:{interval_i}-{interval_e}".format(chrom = wildcards.chrom,
             interval_i = wildcards.interval_i,
             interval_e = wildcards.interval_e)
     resources:
-        mem_mb=1024
+        mem_mb=5120
     wrapper:
-        "v3.10.2/bio/gatk/genotypegvcfs"
+        "v4.7.2/bio/gatk/genotypegvcfs"
 
 
 rule bcftools_concat:
     input:
         calls = get_interval_raw_vcfs,
-        fai = rules.genome_faidx.output
+        fai = f"{basedir}/resources/{{ref}}/{{ref}}.fasta.fai"
     output:
-        vcf = "results/{plate}/variant_calling/GATK/{ref}/{plate}.raw.vcf.gz"
+        vcf = f"{basedir}/results/DB/variant_calling/GATK/{{ref}}/merged/merged.raw.vcf.gz"
     log:
-        'results/{plate}/variant_calling/GATK/{ref}/log/bcftools_merge/{plate}.log'
+        f"{basedir}/log/variant_calling/GATK/bcftools_merge/{{ref}}/concat_raw_vcfs.log"
     params:
         uncompressed_bcf=False,
         extra="-Oz",  # optional parameters for bcftools concat (except -o)
@@ -86,4 +86,4 @@ rule bcftools_concat:
     resources:
         mem_mb=10240,
     wrapper:
-        "v3.10.2/bio/bcftools/concat"
+        "v4.7.2/bio/bcftools/concat"

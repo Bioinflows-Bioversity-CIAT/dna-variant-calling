@@ -12,7 +12,7 @@ properties:
     type: string
     description: Nucleotide sequence index 
   plate:
-    type: integer
+    type: string
     description: Plate identification name
   fq1:
     type: string

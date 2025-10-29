@@ -3,7 +3,7 @@ rule single_sample_variant_detector:
         bam=rules.map_reads.output,
         ref=rules.copy_reference.output
     output:
-        temp(f"{base_dir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/first_variant_calling/{{sample}}_bwa_NGSEP.vcf.gz")
+        temp(f"{basedir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/first_variant_calling/{{sample}}_bwa_NGSEP.vcf.gz")
     params:
         params = " ".join(["-{param} {value}".format(param=i_param, value = config['NGSEP']['SingleSampleVariantsDetector'][i_param]) for i_param in config['NGSEP']['SingleSampleVariantsDetector'].keys()]),
         mem = "-Xmx3g"
@@ -12,7 +12,7 @@ rule single_sample_variant_detector:
     conda:
         "../envs/NGSEP.yaml"
     log:
-        f"{base_dir}/log/variant_calling/NGSEP/first_variant_calling/{{plate}}/{{ref}}/{{sample}}_NGSEP.log"
+        f"{basedir}/log/variant_calling/NGSEP/first_variant_calling/{{plate}}/{{ref}}/{{sample}}_NGSEP.log"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
@@ -27,7 +27,7 @@ rule single_sample_variant_detector:
 rule merge_variants_by_plate:
     input:
         vcfs = get_sample_vcfs_by_plate_merge_variants,
-        ref_list = rules.genome_faidx.output
+        ref_list =  f"{basedir}/resources/{{ref}}/{{ref}}.fasta.fai"
     params:
         mem = "-Xmx40g"
     resources:
@@ -35,9 +35,9 @@ rule merge_variants_by_plate:
     conda:
         "../envs/NGSEP.yaml"
     output:
-        temp(f'{base_dir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/{{plate}}_merged_variants.vcf')
+        temp(f'{basedir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/{{plate}}_merged_variants.vcf')
     log:
-        f"{base_dir}/log/variant_calling/NGSEP/merge_variants/{{plate}}/{{ref}}/merge_variants_NGSEP.log"
+        f"{basedir}/log/variant_calling/NGSEP/merge_variants/{{plate}}/{{ref}}/merge_variants_NGSEP.log"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
@@ -50,7 +50,7 @@ rule single_sample_variant_detector_two:
         ref=rules.copy_reference.output,
         known_variants = rules.merge_variants_by_plate.output
     output:
-        f"{base_dir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/second_variant_call_plate/{{sample}}_bwa_NGSEP.vcf.gz"
+        f"{basedir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/second_variant_call_plate/{{sample}}_bwa_NGSEP.vcf.gz"
     params:
         params = " ".join(["-{param} {value}".format(param=i_param, value = config['NGSEP']['SingleSampleVariantsDetector'][i_param]) for i_param in config['NGSEP']['SingleSampleVariantsDetector'].keys()]),
         mem = "-Xmx3g",
@@ -59,7 +59,7 @@ rule single_sample_variant_detector_two:
     resources:
          mem_mb=3000
     log:
-        f"{base_dir}/log/variant_calling/NGSEP/second_variant_call_plate/{{plate}}/{{ref}}/{{sample}}_NGSEP.log"
+        f"{basedir}/log/variant_calling/NGSEP/second_variant_call_plate/{{plate}}/{{ref}}/{{sample}}_NGSEP.log"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \
@@ -75,7 +75,7 @@ rule single_sample_variant_detector_two:
 rule merge_vcfs_by_plate:
     input:
         vcfs = get_sample_vcfs_by_plate_merge_vcfs,
-        ref_list = rules.genome_faidx.output
+        ref_list =  f"{basedir}/resources/{{ref}}/{{ref}}.fasta.fai"
     params:
          mem = "-Xmx40g"
     resources:
@@ -83,9 +83,9 @@ rule merge_vcfs_by_plate:
     conda:
         "../envs/NGSEP.yaml"
     output:
-        f"{base_dir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/{{plate}}_merged.vcf.gz"
+        f"{basedir}/results/{{plate}}/variant_calling/NGSEP/{{ref}}/{{plate}}_merged.vcf.gz"
     log:
-        f"{base_dir}/log/variant_calling/NGSEP/merge_vcfs_by_plate/{{plate}}/{{ref}}/merge_vcfs_NGSEP.log"
+        f"{basedir}/log/variant_calling/NGSEP/merge_vcfs_by_plate/{{plate}}/{{ref}}/merge_vcfs_NGSEP.log"
     shell:
         """
         java {params.mem} -jar {config[NGSEP][path]} \

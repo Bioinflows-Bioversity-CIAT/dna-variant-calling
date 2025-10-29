@@ -1,2 +1,4 @@
 ref_name	ref_path	STR_path
-v21	/opt/bioinfo/parte1/bioinfo1/references/bean/Pvulgaris/G19833/v2.1/assembly/Pvulgaris_442_v2.0.fa	/opt/bioinfo/parte1/bioinfo1/references/bean/Pvulgaris/G19833/v2.1/STRs/Pvulgaris_442_v2.0.fa.2.7.7.80.10.20.50_filtered.ngs
+UI111	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/references/genomes/Pvulgaris/UI-111/v1.1/assembly/PvulgarisUI111_534_v1.0.fa	
+Pv21	/opt/InterspecificCommonBeanDenovoGenomeAssembly/5.Others/references/genomes/Pvulgaris/G19833/v2.1/assembly/Pvulgaris_442_v2.0.fa
+
