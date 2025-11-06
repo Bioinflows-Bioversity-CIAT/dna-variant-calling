@@ -1,4 +1,4 @@
-basedir: "/home/scruz/evros_project"
+basedir: "/home/scruz/SIL"
 
 
 sequencing_units: config/sequencing_units.tsv
@@ -39,7 +39,7 @@ GATK:
   HaplotypeCaller:
     G: ["StandardAnnotation", "StandardHCAnnotation"]
     kmer-size: [11,17,23,29,35,41]
-    min_base-qual: 28
+    min_base-qual: 10
     extra:
       - "--do-not-run-physical-phasing"
   CombineGVCFs:

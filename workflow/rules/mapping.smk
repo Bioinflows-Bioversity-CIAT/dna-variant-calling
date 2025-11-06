@@ -1,57 +1,45 @@
-rule map_reads2:
+rule minimap:
     input:
-        reads = get_trimmed_reads,
-        idx = rules.bwa_index.output,
-        ref = rules.copy_reference.output,
+        fastq = get_sample_fastq,
+        ref = f"{basedir}/resources/{{ref}}/{{ref}}.fasta"
     output:
-        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sam"
-    log:
-        f"{basedir}/log/mapping/{{plate}}/{{ref}}/{{sample}}_bwa_mem.log"
-    params:
-        index=lambda w, input: os.path.splitext(input.idx[0])[0],
-        extra=get_read_group,
-        sorting="samtools",
-        sort_order="coordinate",
-    resources:
-        tmpdir = get_big_temp
-    threads: resources['bwa_mem']['threads']
+        sam = temp(f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}.sam")
     conda:
-        "ngs"
+        "anchorwave"
     shell:
         """
-        bwamem -t {threads} \
-        -R '@RG\\tID:{wildcards.sample}\\tSM:{wildcards.sample}\\tPL:Illumina' \
-        {input.ref} \
-        {input.reads} > {output} 2> {log}
-
+        minimap2 -ax map-ont {input.ref} {input.fastq} > {output.sam}
         """
-rule map_reads:
-    input:
-        reads = get_trimmed_reads,
-        idx = rules.bwa_index.output,
-    output:
-        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sorted.bam"
-    log:
-        f"{basedir}/log/mapping/{{plate}}/{{ref}}/{{sample}}_bwa_mem.log"
-    params:
-        extra=r"-R '@RG\tID:{sample}\tSM:{sample}'",
-        sort="samtools",  # Can be 'none', 'samtools', or 'picard'.
-        sort_order="coordinate",  # Can be 'coordinate' (default) or 'queryname'.
-        sort_extra="",  # Extra args for samtools/picard sorts.
-    threads: resources['bwa_mem']['threads']
-    wrapper:
-        "v5.9.0/bio/bwa-mem2/mem"        
 
-
-rule samtools_index:
+rule sam_bam:
     input:
-        rules.map_reads.output,
+        sam = f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}.sam"
     output:
-        f"{basedir}/results/{{plate}}/mapping/bwa/{{ref}}/{{sample}}.sorted.bam.bai"
-    log:
-        f"{basedir}/log/mapping/{{plate}}/{{ref}}/{{sample}}_index_bam.log"
-    params:
-        extra="",  # optional params string
-    threads: 4  # This value - 1 will be sent to -@
-    wrapper:
-        "v4.7.2/bio/samtools/index"
+        bam = temp(f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}.bam"),
+        bam_sort = temp(f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}_sort.bam"),
+        bam_index = temp(f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}_sort.bam.bai")
+    conda:
+        "anchorwave"
+    shell:
+        """
+        samtools view -S -b {input.sam} > {output.bam} && \
+        samtools sort -o {output.bam_sort} {output.bam} && \
+        samtools index {output.bam_sort}
+        """ 
+
+rule rehead_bam_file:
+    input:
+        bam = f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}_sort.bam"
+    output:
+        bam = f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}_rehead.bam",
+        index = f"{basedir}/results/{{plate}}/mapping/minimap2/{{ref}}/{{sample}}_rehead.bam.bai"
+    conda:
+        "anchorwave"
+    shell:
+        """
+        samtools addreplacerg \
+        -r "@RG\tID:{wildcards.sample}\tSM:{wildcards.sample}\tPL:ONT" \
+        --output-fmt BAM \
+        -o {output.bam} {input.bam} && \
+        samtools index {output.bam}
+        """

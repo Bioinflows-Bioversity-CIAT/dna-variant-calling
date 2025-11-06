@@ -1,8 +1,8 @@
 rule haplotype_caller_gvcf:
     input:
         # single or list of bam files
-        bam = rules.map_reads.output,
-        bai = rules.samtools_index.output,
+        bam = rules.rehead_bam_file.output.bam,
+        bai = rules.rehead_bam_file.output.index,
         ref = rules.copy_reference.output,
         genome_dict = rules.create_dict.output
     output:
